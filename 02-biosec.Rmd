@@ -2,298 +2,199 @@
 #########################################
 # options for knitting a single chapter #
 #########################################
+
 output:
   bookdown::pdf_document2:
     template: templates/brief_template.tex
     citation_package: biblatex
+    extra_dependencies: ["booktabs"]
   bookdown::html_document2: default
   bookdown::word_document2: default
 documentclass: book
-#bibliography: [bibliography/references.bib, bibliography/additional-references.bib]
+params:
+  width: 70%
+
+#maintenance check code
+bibliography: [bibliography/references.bib] 
+
+#chapter only
+#bibliography: [bibliography/biosec-ref.bib] 
+
 ---
 
-```{block type='savequote', quote_author='(ref:cicero-quote)', include=knitr::is_latex_output()}
-Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...
+```{r setup, include = F}
 
-There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...
-```
-(ref:cicero-quote) --- Cicero's *de Finibus Bonorum et Malorum*.
-
-<!-- 
-Notes for adding an opening quote in PDF output:
-i) add the reference for the quote with the chunk option quote_author="my author name",
-ii) include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex' means that these quotes are only included when output is latex (in HTML output, it would appear by the end of the previous page)
-iii) You can't use markdown syntax inside chunk options, so if you want to e.g. italicise a book name in the quote reference use a 'text reference': Create a named piece of text with '(ref:label-name) My text', then link to this in the chunk option with quote_author='(ref:label-name)'
--->
-
-# R Markdown basics {#rmd-basics}
-\minitoc <!-- this will include a mini table of contents-->
-
-<!-- LaTeX normally does not indent the first line after a heading - however, it does so after the mini table of contents. You can manually tell it not to with \noindent -->
-\noindent Here is a brief introduction to using *R Markdown*. 
-*Markdown* is a simple formatting syntax for authoring HTML, PDF, and MS Word documents and much, much more. 
-*R Markdown* provides the flexibility of *Markdown* with the implementation of **R** input and output.  For more details on using *R Markdown* see <http://rmarkdown.rstudio.com>.
-
-
-## Basic markdown syntax
-### Whitespace
-Be careful with your spacing. 
-While whitespace largely is ignored, it does at times give markdown signals as to how to proceed. 
-As a habit, try to keep everything left aligned whenever possible, especially as you type a new paragraph. 
-In other words, there is no need to indent basic text in the Rmd document (in fact, it might cause your text to do funny things if you do).
-
-### Italics and bold
-- *Italics* are done like \*this\* or \_this\_
-- **Bold** is done like \*\*this\*\* or \_\_this\_\_
-- **_Bold and italics_** is done like \*\*\*this\*\*\*, \_\_\_this\_\_\_, or (the most transparent solution, in my opinion) \*\*\_this\_\*\*
-
-### Inline code
-- `Inline code` is created with backticks like `` `this` ``
-
-### Sub and superscript 
-Sub~2~ and super^2^ script is created like this\~2\~ and this\^2\^
-
-### Strikethrough
-- ~~Strikethrough~~ is done \~\~like this\~\~
-
-### 'Escaping' (aka "What if I need an actual asterisk?")
-- To include an actual \*, \_ or \\, add another \\ in front of them: \\\*, \\\_, \\\\
-
-### Endash (--), emdash (---)
-- -- and --- with \-\- and \-\-\-
-
-### Blockquotes
-Do like this:
-
-> Put a \> in front of the line.
-
-### Headings
-Section headers are created with \#'s of increasing number, i.e. 
-  
-- \# First-level heading
-- \#\# Second-level heading
-- \#\#\# Etc.
-
-In PDF output, a level-five heading will turn into a paragraph heading, i.e. `\paragraph{My level-five heading}`, which appears as bold text on the same line as the subsequent paragraph.
-
-
-### Lists
-Unordered list by starting a line with an \* or a \-:
-
-* Item 1
-* Item 2
-
-Ordered lists by starting a line with a number.
-Notice that you can mislabel the numbers and *Markdown* will still make the order right in the output:
-
-1. Item 1
-4. Item 2
-
-
-To create a sublist, indent the values a bit (at least four spaces or a tab):
-
-1. Item 1
-1. Item 2
-1. Item 3
-    - Item 3a
-    - Item 3b
-
-### Line breaks
-
-The official *Markdown* way to create line breaks is by ending a line with more than two spaces.
-
-Roses are red.
-Violets are blue.
-
-This appears on the same line in the output, because we didn't add spaces after red.
-
-Roses are red.   
-Violets are blue.
-
-This appears with a line break because I added spaces after red.
-
-I find this is confusing, so I recommend the alternative way: Ending a line with a backslash will also create a linebreak:
-
-Roses are red.\
-Violets are blue.
-
-To create a new paragraph, you put a blank line.
-
-Therefore, this line starts its own paragraph.
-
-### Hyperlinks
-- [This is a hyperlink](https://www.google.com) created by writing the text you want turned into a clickable link in `[square brackets followed by a](https://hyperlink-in-parentheses)`
-
-### Footnotes
-- Are created^[my footnote text] by writing either \^[my footnote text] for supplying the footnote content inline, or something like `[^a-random-footnote-label]` and supplying the text elsewhere in the format shown below [^test-footnote]:
-
-`[^a-random-footnote-label]: This is a random test.`
-
-[^test-footnote]: This is a random test.
-
-### Comments
-To write comments within your text that won't actually be included in the output, use the same syntax as for writing comments in HTML. That is, \<!\-\- this will not be included in the output \-\->.
-
-<!-- It is super useful to use comments! -->
-
-### Math
-The syntax for writing math is stolen from LaTeX. To write a math expression that will be shown **inline**, enclose it in dollar signs.
-  - This: \$A = \\pi*r^{2}\$  Becomes: $A = \pi*r^{2}$
-  
-To write a math expression that will be shown in a block, enclose it in two dollar signs.\
-This: `r ifelse(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex', "\\$\\$A = \\\\pi*r^{2}\\$\\$", "<span>&#36;</span>\\$A = \\\\pi*r^{2}\\$\\$")`
-
-Becomes: 
-$$A = \pi*r^{2}$$
-
-To create numbered equations, put them in an 'equation' environment and give them a label with the syntax `(\#eq:label)`, like this:
-
-```latex
-\begin{equation} 
-  f\left(k\right) = \binom{n}{k} p^k\left(1-p\right)^{n-k}
-  (\#eq:binom)
-\end{equation} 
-```
-
-Becomes:
-\begin{equation}
-f\left(k\right)=\binom{n}{k}p^k\left(1-p\right)^{n-k}
-(\#eq:binom)
-\end{equation}
-
-
-For more (e.g. how to theorems), see e.g. the documentation on [bookdown.org](https://bookdown.org/yihui/bookdown/markdown-extensions-by-bookdown.html#equations)
-
-
-## Executable code chunks {#code}
-The magic of R Markdown is that we can add executable code within our document to make it dynamic.
-
-We do this either as *code chunks* (generally used for loading libraries and data, performing calculations, and adding images, plots, and tables), or *inline code* (generally used for dynamically reporting results within our text).
-
-The syntax of a code chunk is shown in Figure \@ref(fig:chunk-parts).
-
-```{r chunk-parts, echo=FALSE, fig.cap="Code chunk syntax", out.width="100%", message=FALSE, fig.pos='H'}
+library(knitr)
 library(tidyverse)
-knitr::include_graphics("figures/sample-content/chunk-parts.png")
+library(kableExtra)
+
 ```
 
-Common chunk options include (see e.g. [bookdown.org](https://bookdown.org/yihui/rmarkdown/r-code.html)):
+```{r localFunctions, include = F}
 
-- `echo`: whether or not to display code in knitted output
-- `eval`: whether or to to run the code in the chunk when knitting
-- `include`: whether to include anything from the from a code chunk in the output document
-- `fig.cap`: figure caption
-- `fig.scap`: short figure caption, which will be used in the 'List of Figures' in the PDF front matter
-
-**IMPORTANT**: Do *not* use underscoores in your chunk labels - if you do, you are likely to get an error in PDF output saying something like "! Package caption Error: \\caption outside float".
-
-### Setup chunks - setup, images, plots
-An R Markdown document usually begins with a chunk that is used to **load libraries**, and to **set default chunk options** with `knitr::opts_chunk$set`.
-
-In your thesis, this will probably happen in **index.Rmd** and/or as opening chunks in each of your chapters.
-
-````
-`r ''````{r setup, include=FALSE}
-# don't show code unless we explicitly set echo = TRUE
-knitr::opts_chunk$set(echo = FALSE)
-
-library(tidyverse)
-```
-````
-
-### Including images
-Code chunks are also used for including images, with `include_graphics` from the `knitr` package, as in Figure \@ref(fig:oxford-logo)
-
-```{r oxford-logo, fig.cap="Oxford logo", out.width='50%', fig.align='center'}
-knitr::include_graphics("figures/sample-content/beltcrest.png")
-```
-
-Useful chunk options for figures include:
-
-- `out.width` (use with a percentage) for setting the image size 
-- if you've got an image that gets waaay to big in your output, it will be constrained to the page width by setting `out.width = "100%"`
-
-
-#### Figure rotation {-}
-You can use the chunk option `out.extra` to rotate images.
-
-The syntax is different for LaTeX and HTML, so for ease we might start by assigning the right string to a variable that depends on the format you're outputting to:
-
-```{r}
-if (knitr::is_latex_output()){
-  rotate180 <- "angle=180"
-} else {
-  rotate180 <- "style='transform:rotate(180deg);'"
+lineBreaks <- function(.text = matDefine, .max_str_length = 30) {
+  
+  objType <- typeof(.text)
+  
+  if (objType == "list") {
+    all_out <- "dummy"
+  } else if (objType == "character") {
+    
+    all_out <- list()
+    
+    for (i in .text) {
+      str_length <- stringr::str_length(i)
+      if (str_length <= .max_str_length) {
+        str_out <- i
+      } else {
+        split_start <- seq(from = 1, to = (str_length - 6), by = .max_str_length)
+        split_end <- c((start_split[-1] - 1), str_length)
+        split_strs <- stringr::str_sub(i, split_start, split_end)
+        need_brks <- split_strs[-length(split_strs)]
+        end_str <- split_strs[length(split_strs)]
+        added_brks <- c(paste0(need_brks, "//-/n"), end_str)
+        str_out <- paste(added_brks, collapse = "")
+        all_out <- "dummy"
+          }
+    }
+  } else {
+    print("Input must be a character vector or dataframe with at least one character column.")
+  }
+  
+  return(all_out)
+  
 }
+
 ```
 
-Then you can reference that variable as the value of `out.extra` to rotate images, as in Figure \@ref(fig:oxford-logo-rotated).
+# Fishing gear and other anthropogenic debris adrift at sea present a novel biosecurity concern
+\chaptermark{Biosecurity concerns of AMD}
 
-```{r oxford-logo-rotated, out.extra=rotate180, fig.cap="Oxford logo, rotated", out.width='50%', fig.align='center', echo=FALSE}
-knitr::include_graphics("figures/sample-content/beltcrest.png")
+
+## Abstract
+
+Anthropogenic marine debris (AMD) is an abundant and increasing environmental pollutant. It directly causes the death of marine life through smothering and entanglement, increases mortality through ingestion, and damages both the natural environment and human communities it accumulates in.  Scientific studies and stakeholder accounts also report potential harm caused by the association of non-indigenous species (NIS) with plastic pollution and other types of AMD. This research tested whether this perception arises from a significantly elevated presence of NIS on marine litter of human origin compared to natural materials in the same environment. A database containing records of organisms associated with AMD (OAAMD) published in the scientific literature between 1992 and 2019 enabled statistical testing for this elevated presence and the hypothesised increased presence of NIS on debris near urban areas. Across the nine animal phyla recorded in the OAAMD database, the proportion of NIS in AMD communities was over 60 times higher than in the overall marine community. These NIS taxa were found outside of their specialist-delineated native marine regions in over 85% of records. Of these, 80 records represented novel findings in marine regions outside of their known range.  A significantly larger proportion of these NIS records were also found within 150km of an urban coastal area. Although the  type of AMD was often not reported at the level of an individual organism by the studies synthesised, available data did suggest that NIS may more often be found on structurally complex debris items like fishing gear and synthetic fabrics than on flat or smooth plastics, metal, and natural materials. This study supports the hypothesis that NIS are using debris items as habitat more frequently than other taxa and suggests that this prevalence is further increased on structurally complex surfaces and near urban areas.
+
+
+## Introduction
+
+
+Driftwood, kelp mats, and other types of naturally occurring debris floating at the ocean’s surface support diverse communities of organisms adapted to the specific habitat conditions they provide (Thiel & Gutow, 2004). The long history of association between these communities and natural floating debris has moulded their geographic distributions along the paths of surface currents driven by prevailing winds, notably in the case of Caribbean reef fishes (Luiz et al., 2012) and open-ocean crabs in the Mediterranean (Pfaller, Payton, Bjorndal, Bolten, & McDaniel, 2019). Rafting, the process in which species are transported on floating debris, has also been shown to occur aboard the mass of anthropogenic marine debris now floating alongside this natural mixture (Barnes & Milner, 2005; Gil & Pfaller, 2016; Miralles, Gomez-Agenjo, Rayon-Viña, Gyraitė, & García-Vazquez, 2018).
+
+Anthropogenic marine debris (AMD) presents a large and increasing amount (Koelmans, Kooi, Law, & Van Sebille, 2017; Lebreton et al., 2018) of habitat for rafting organisms and their consumers in the top layer of the world’s oceans (Goldstein, Carson, & Eriksen, 2014; Hoeksema, Roos, & Cadée, 2012; McCuller & Carlton, 2018). Studies consistently find that most of this debris is composed of petroleum-based synthetic materials  (Gönülal, Öz, Güreşen, & Öztürk, 2016; Hong, Lee, Kang, Choi, & Ko, 2014; Lavers, Dicks, Dicks, & Finger, 2019; Santos, Friedrich, & Ivar do Sul, 2009). In 2018, approximately 357 Mt of these synthetics were produced globally (PlasticsEurope, 2019). Much of this production will be recycled or recaptured for energy production. However, the amount of plastic which bypasses these fates and deposits in landfills or the natural environment is projected to reach 12,000 Mt by 2050 (Geyer, Jambeck, & Law, 2017). 
+
+These tonnes of buoyant AMD include single-use items and fishing gear, along with a mixture of other plastics, rubber, petroleum-based cloth and fibres, metal, and engineered wood products (Gönülal et al., 2016; Hong et al., 2014; Lavers et al., 2019). The majority of this material is fragments, fibres, and pellets larger than 5mm at its longest dimension, collectively known as macrodebris (Koelmans et al., 2017). Most floating anthropogenic macrodebris is resistant to structural degradation over long time-frames (O’Brine & Thompson, 2010) and may therefore be capable of traversing vast oceanic distances intact (Pearce, Jackson, & Cresswell, 2018).
+
+When the Tohuku-Oki earthquake caused a tsunami that flooded the area surrounding Fukushima Daiichi, Japan in 2011, entire communities of marine life were transported across the North Pacific on thousands of items ranging from household litter to entire piers (Carlton et al., 2017). Numerous other studies have documented shorter distance travel aboard debris (Provide several citations instead). While AMD has not been suggested as the most likely source of any introduction of an NIS, its documented ability to transport marine organisms (Citations needed) suggests that it could be considered among other modes of transporting potentially harmful organisms (Audrézet et al., 2021), known as introduction vectors. 
+
+Some species transported by human activities, referred to broadly as NIS, are known to cause harm to both human and natural systems (Cite?). A 2021 meta-analysis estimated that harms related to aquatic invasive species, combining both freshwater and marine environments, cost the global economy a total of 23 million USD in 2020 alone (Cuthbert et al., 2021). These costs may arise directly from mitigation efforts and lost revenues in fisheries (Schwoerer, Little, & Adkison, 2019) or damage to infrastructure (Park & Hushak, 1999), among other economic impacts. Beyond monetary costs, NIS can change how ecosystems function, altering the composition of native species (Jackson et al., 2017) and reducing the services those ecosystems provide to human communities (Katsanevakis et al., 2014). 
+
+Characterisation of distinct introduction vectors facilitates a border-focussed biosecurity strategy, suggested to be the most efficient means of preventing and responding to incursions of NIS (Hewitt & Campbell, 2007). Doing so for AMD requires delineating common pathways, identifying sinks along  coastline with higher concentrations of arrivals, describing the physical environment encountered by organisms transported aboard the vector and along the pathway, and compiling species known to use the vector (Faulkner et al., 2020). In the case of AMD as an introduction vector, this characterisation can be pulled from decades of tangential research in oceanography, materials science, and marine biology (Audrézet et al., 2021; Bergmann, Gutow, & Klages, 2015). 
+
+By combining a 2021 database of published records of organisms associated with anthropogenic marine debris (OAAMD) (McMains et al., 2021) with the World Register of Introduced Marine Species (WRiMS) (Rius et al., 2020), this study aimed to compile the listed NIS, as categorised by various biosecurity management bodies, which are found associated with  AMD. Using this compilation we tested whether the physical environment presented by AMD is favourable to particular species and to identify transit patterns. Spatial, physical, and biological patterns in these species on AMD were also identified. An increased prevalence of NIS on artificial debris, commonly reported by clean-up groups and other coastal stakeholders (pers. comm.), was tested for in addition to whether this potential increase was correlated with proximity to an urban centre. 
+
+
+## Methods
+
+
+This study combines information from three databases, each selected for the quality of their data, including collection and specialist verification processes:
+
+ - OAAMD: Organisms associated with anthropogenic marine debris (McMains et al., 2021) synthesised over 20 years of published research in life- and materials-science to provide a collated database of recorded associations of organisms with floating and immersed anthropogenic marine debris and their locations; 
+ - WRiMS: The World Register of Introduced Marine Species (Rius et al., 2020) combined contemporary lists of species known to biosecurity agencies as invasive, managed, or potentially concerning from 64 countries; 
+ - and WoRMS: The World Register of Marine Species (WoRMS Editorial Board, 2020) used to provide standardised nomenclature and as the most comprehensive available reference of marine species known to science.
+
+Geographic distributions for each species both found in the OAAMD and listed as invasive, managed, or concerning species in WRiMS were pulled from specialist-validated sources: the Smithsonian’s NEMESIS database (Fofonoff, Ruiz, Steves, Simkanin, & Carlton, 2021), WoRMS (WoRMS Editorial Board, 2020), CABI Invasive Species Compendium (CABI, 2021), and the Global Invasive Species Database (GISD, 2021).  These sources were supplemented, in some cases, by published scientific articles or theses (Table XX, Supplemental data). Where active scientific debate or uncertainty about an organism’s native range was ongoing in 2020, the organism was listed as having no native range and excluded from analyses focused on regional patterns. Distributions were described using Marine Ecoregions of the World delineated by (Cite). 
+
+For the purposes of this analysis, material type was summarised into several broad categories based on the more varied assortment reported in the OAAMD. The categories in Table \@ref(tab:materialDefine) represent an attempt to best group within data availability and factors known to influence fouling patterns, such as the tendency of fishing gear to be littered into the environment already fouled (Cite). Material type, when available, was almost always reported at the study level and not attached to records of individual organisms. There were also inconsistencies in the detail used in reporting the type of plastic found. Where material type is described by function, the definitions provided in XX were used (Cite).
+
+```{r materialDefine, echo = F, out.width = params$width, fig.scap = "Material type definitions", fig.cap = "Material type designations used to classify the broader range of materials found in the OAAMD to provide adequate sample sizes in the following statistical analyses."}
+
+matTypes <- c("Plastic", "Fishing gear", "Megastructure", "Fabric", "Glass or ceramic", "Metal", "Other", "Unknown")
+
+matDefine <- c("All petroleum-derived synthetic materials were not used in fishing gear.",
+               "A subset of plastics that originated as the result of fishing or aquaculture.",
+               "Complex large structures composed of multiple potential materials.",
+               "Synthetic and artificial fabrics as often vaguely described in sources.",
+               "Smooth and rigid non-petroleum derived artificial substrates.",
+               "All materials identified as metal, or a type of.",
+               "Broad and diverse category of materials each with a small number of records.",
+               "Used where material type was unreported in the source.")
+
+matData <- data.frame(matTypes, matDefine)
+
+knitr::kable(matData,
+      col.names = c("Material", "Definition"),
+      booktabs = T) %>%
+  kable_styling(latex_options = "scale_down")
+
 ```
 
+Statistical analysis and visualisations for this paper were completed in the R Statistical Computing environment (R Core Team, 2018) and tested the following hypotheses: 
 
-### Including plots
-Similarly, code chunks are used for including dynamically generated plots.
-You use ordinary code in R or other languages - Figure \@ref(fig:cars-plot) shows a plot of the `cars` dataset of stopping distances for cars at various speeds (this dataset is built in to **R**).
+ - H1: The percentage of NIS within the community recorded on AMD is not significantly higher than in the background marine community;
+ - H2: The percentage of NIS within the community recorded on AMD is not significantly higher on debris within 150km of coastal urban area than outside of this radius;
+ - H3: NIS are not found within the community on AMD more frequently in marine regions directly adjacent to or within the native range for the species.
 
-```{r cars-plot, fig.cap = "A ggplot of car stuff"}
-cars %>% 
-  ggplot() +
-    aes(x = speed, y = dist) +
-    geom_point()
-```
-
-Under the hood, plots are included in your document in the same way as images - when you build the book or knit a chapter, the plot is automatically generated from your code, saved as an image, then included into the output document.
-
-### Including tables
-Tables are usually included with the `kable` function from the `knitr` package.
-
-Table \@ref(tab:cars-table) shows the first rows of that cars data - read in your own data, then use this approach to automatically generate tables.
-
-```{r cars-table}
-cars %>% 
-  head() %>% 
-  knitr::kable(caption = "A knitr kable table")
-```
-
-- Gotcha: when using [`kable`](https://www.rdocumentation.org/packages/knitr/versions/1.21/topics/kable), captions  are set inside the `kable` function
-- The `kable` package is often used with the [`kableExtra`](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html) package
-
-### Control positioning
-One thing that may be annoying is the way *R Markdown* handles "floats" like tables and figures.
-In your PDF output, LaTeX will try to find the best place to put your object based on the text around it and until you're really, truly done writing you should just leave it where it lies.
-
-In general, you should allow LaTeX to do this, but if you really *really* need a figure to be positioned where you put in the document, then you can make LaTeX attempt to do this with the chunk option `fig.pos="H"`, as in Figure \@ref(fig:oxford-logo-controlled):
-
-```{r oxford-logo-controlled, fig.cap="An Oxford logo that LaTeX will try to place at this position in the text", out.width='50%', fig.align='center', fig.pos="H"}
-knitr::include_graphics("figures/sample-content/beltcrest.png")
-```
-
-As anyone who has tried to manually play around with the placement of figures in a Word document knows, this can have lots of side effects with extra spacing on other pages, etc.
-Therefore, it is not generally a good idea to do this - only do it when you really need to ensure that an image follows directly under text where you refer to it (in this document, I needed to do this for Figure \@ref(fig:latex-font-sizing) in section \@ref(max-power)).
-For more details, read the relevant section of the [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/figure-placement.html).
+### H1: Prevalence of invasive species in the recorded AMD community
 
 
-## Executable inline code
-'Inline code' simply means inclusion of code inside text. 
-The syntax for doing this is `` ``r ''`r R_CODE` ``
-For example, `` ``r ''`r 4 + 4` `` will output `r 4 + 4` in your text.
+The community recorded on AMD is determined by physical aspects of the environment, the biology of each organism, interactions between organisms, and biases inherent to scientific effort and publication. These may combine to impact the relative presence of NIS recorded within the community on debris. To test whether they cause a significant increase in the prevalence of listed invasive species on AMD above that found in the background marine community, species lists from the two communities were compared in a series of simulations. This analysis did not account for regional factors, and instead compared overall global trends represented within the OAAMD, for the AMD community, and WoRMS, for the background marine community. 
 
-You will usually use this in parts of your thesis where you report results - read in data or results in a code chunk, store things you want to report in a variable, then insert the value of that variable in your text.
-For example, we might assign the number of rows in the `cars` dataset to a variable:
+All records belonging to nine animal phyla (Arthropoda, Bryozoa, Hydrozoa, Mollusca, Serpulida, need to finish list), containing the majority of species listed as invasive or of concern recorded on anthropogenic debris in the OAAMD, were subset from both databases. Random, unweighted sampling without replacement (Cite) was used to generate a simulated community from one of these sets of species. Species richness for the community was selected from a normal distribution with the upper and lower limits pulled from the distribution of richness seen in studies underpinning the OAAMD (minimum = 6, maximum = 89). Invasive species richness was then divided by the total species richness to calculate the percent of that community which were classified as NIS.
 
-```{r}
-num_car_observations <- nrow(cars)
-```
+This process was repeated 10,000 times for each of the two datasets, resulting in 20,000 calculations of the percent of species listed as invasive. An ANOVA based on a logit-link linear model (Cite) was used to test whether the distribution of percent NIS was significantly different between communities simulated from the OAAMD and WoRMS datasets. A logit model was selected because its assumptions align with the derived probabilities calculated during the simulations (Cite).
 
-We might then write:\
-"In the `cars` dataset, we have `` ``r ''`r num_car_observations` `` observations."
-
-Which would output:\
-"In the `cars` dataset, we have `r num_car_observations` observations."
+### H1a: Increased likelihood of recording listed invasive species 
 
 
-## Executable code in other languages than R
-If you want to use other languages than R, such as Python, Julia C++, or SQL, see [the relevant section of the *R Markdown Cookbook*](https://bookdown.org/yihui/rmarkdown-cookbook/other-languages.html) 
+This process was performed again with the addition of a weighting value applied to the selection of species listed as NIS. The weighting value increased the likelihood that an NIS would be selected at random, relative to non-NIS species, from the list of species found in WoRMS. Weighting values were set at each of the numbers between 5 and 100 to generate a logit-link linear model of the relationship between likelihood of selecting an NIS and the resulting proportion of the simulated community that NIS represent. These values were selected to incorporate the high variability in percent NIS seen in the unweighted model and anchored around the overall ratio of NIS within the AMD and background marine communities compared (60:1, from memory, need to check). A statistically similar proportion of NIS to that found on artificial debris was inferred to be found where confidence intervals (2.5% and 97.5%) overlapped the mean proportion calculated from the 10,000 simulations on the AMD community.
+
+### H2: Urban centres influence on prevalence of listed invasive species
+
+
+Geographic coordinates for each record, provided within the OAAMD, allowed for the identification of records found within a 150km radius of the centre point of a named settlement with a population over 50,000 (Cite). Records within this radius were considered urban, according to the definition of large towns and urban centres provided by the Australian Bureau of Statistics (Cite) A chi-squared analysis (Cite) was used to test whether the number of records of listed invasive species was significantly higher than non-listed species on AMD within this radius.
+
+### H3: Connectivity between the native range of NIS on debris and where it was found 
+
+
+The scientifically established ranges of each NIS were compared to the regions where the organisms were recorded in the OAAMD database (Cite). This allowed records of NIS found within their native ranges to be excluded from the connectivity analysis. The “distance” between each remaining record and its nearest native or introduced range was then calculated as the fewest number of regions it would have “passed through” to travel between the two using a breath first algorithm in the iGraph implementation in R (Cite). Each record was assumed to have come from the nearest native region for that taxa. When distance ties occurred, both regions were assumed to have been the source. Secondary introductions, in which a species is transferred from its introduced range into another new region, and more complicated journeys across multiple regions were not included in the assumptions of this model. Though likely scenarios, the dataset used includes numerous sources of variability and error that would not support such a complex model.
+
+Connection weight was quantified as the number of NIS records in region “A” likely originating from region “B”. Regions were grouped using the algorithm developed by Brandes et. al which maximises the strength of the connections within the group and minimises connections to nodes outside of the group (Cite). This analysis and the creation of visualisations were performed in the R implementation of iGraph (Cite) using tidygraph (Cite) and ggraph (Cite). Records from Japanese tsunami marine debris were excluded from this portion to achieve more balanced sample sizes.
+
+## Results
+
+
+Of the 6,542 organisms in the complete database of OAAMD, 792 belonged to species listed as an invasive, managed, or concerning species in the World Register of Invasive Marine Species (Rius et al., 2020) (Table XX, Supplementary material). Throughout the recorded time-period (1990-2019), the ratio of unique NIS to unique taxa stayed steady at around 5% (Figure 1). Records were concentrated in the NE Pacific Ocean (n = 684), due to the thorough study of debris related to the Japanese tsunami (Carlton et al., 2017). Outside of this study, the next most frequent regions were European territorial waters in the NE Atlantic Ocean (n = 33) and Mediterranean Sea (n = 28). The listed invasive species most frequently found are globally wide-spread and known to have broad environmental tolerances: Mytilus galloprovincialis (Cite) (n = 291), Megabalanus rosa (Cite) (n = 115), and Magallana gigas (Cite) (n = 74). Listed taxa were most common on fishing gear (n =270) and megastructures (n = 200), the latter primarily associated with Japanese tsunami debris.
+
+Plastics, the most frequently recorded material harbouring associated organisms (n = 2,506), showed a comparatively low presence (3%) of listed NIS within its associated community (Figure 2). By contrast, items categorised as fabrics (n = 856), showed a very high percentage of NIS within its community. Out of all records related to fabric, 13% were listed NIS, which was a close third behind fishing gear (20%) and megastructures (16%). Few records of NIS were found on hard surfaces like metal (n = 32) or glass and ceramic (n = 25).
+
+Material type was missing for a high number of records in the OAAMD database overall (n = 773) and almost never recorded at the level of an individual organism, which precluded testing hypotheses about the material preferences of listed taxa. Location, however, was recorded for all the studies reporting the biological community on floating artificial substrates. While often not recorded at the level of an individual taxa (43.7% of records), most studies recorded location data at the study level on a discrete and delineated area of less than 200 km2. 
+
+A general scientific consensus, within the sources listed in the methods, was also available for the native and introduced ranges of all but 6 out of 80 total listed species: 2 listed as invasive (Botryllus schlosseri and Bugula neritina) and 4 listed as a concern (Didemnum perlucidum, Lepas anserifera, Megabalanus rosa, and Tricellaria occidentalis). Their entire known range was categorised as introduced. Based on these established distributions, nearly 80 (XX%) records represented a range expansion of an NIS into a novel marine region (Table 1). Fewer than 15% of listed NIS were found within their native range (n = 104). This pattern only broke for the North Atlantic and Indian Oceans (Figure 3), though these regions were also four of the top five most common native ranges for the organisms found on AMD (Table 2).
+
+For NIS found outside of their native range, over 80% were found in a marine region directly adjacent to their native range (n = 66). Connections between the nearest native marine region and the region in which  a debris item carrying an NIS was found showed a similar pattern in a graph analysis. Regions grouped using the leading eigenvector method (Cite) formed three groups of stronger species transfer (Figure 4), in which the groups were majority composed of adjacent regions. A notable exception to this was in Group A, where the NW Pacific Ocean showed stronger connections with the North Atlantic Ocean and the Eastern Indian Ocean. Again, these exceptions were the top five most common native regions by species found on AMD (Table 2). 
+
+Within regions, there appeared to be a statistically significant increase in the proportion of NIS in studies and on debris items found within 150km of cities of over 50,000 population (include stat and DF, p < 0.001) in a chi-squared test (Cite). The documented AMD community near urban regions was comprised of nearly 15% species listed in WRiMS, compared to just over 10% in communities on AMD found in areas more than 150km from urban areas (Table 3).
+
+Summarised across locations and materials, the percent of NIS among the community of organisms on floating synthetic materials (12.3%) was shown to be sharply elevated above that in the comparable background marine community (0.2%) across the nine most common animal phyla. Communities randomly assembled from all taxonomically registered species in these nine phyla, representing the background marine community, showed significantly different (add test statistic, p < 0.001) proportions of NIS compared to communities randomly assembled from only those species found on AMD according to a logit-link ANOVA (Cite). Across 10,000 simulations, the randomly generated community of AMD showed a mean proportion of NIS equal to 12.3% (sd = 5.0%), compared to 0.3% (sd = 1.0%) background (Figure 5). A background marine community that was statistically similar to that found on AMD could be generated using weights between 39 and 81, according to the confidence intervals on a logit-link linear model (Figure 5). An identical proportion of NIS was generated when they were 64 times more likely to be selected. 
+
+
+## Discussion
+
+
+This analysis demonstrates that there is a statistically significant relationship between artificial substrates floating in the world’s oceans and organisms listed as NIS—a relationship commonly hypothesised by field researchers, but until now untested. From the first records of listed taxa on anthropogenic debris to appear in the scientific literature in 1994, this relationship has also remained relatively stable (Figure 1). Starting in 1997 with the first published identifications of NIS on debris, and throughout the topical research boom beginning in the early 2010’s, species listed as invasive, managed, or concerning in WRiMS have represented about 5% of the total number of unique species recorded on debris. This nearly 30-year stability in the overall ratio of NIS by species richness, which was also shown to be significantly higher than in the background marine community at a more granular level. Both may arise as a result of similarly steady driving forces such as methodological and reporting biases and biological influences.
+
+Within the available data it was not possible to determine whether these forces were biological or methodological. Biologically, this relationship may arise from selection pressures inherent to synthetic materials floating at the surface of the ocean.  Anthropogenic marine debris may differ from common types of natural debris in ways that make it more suitable to the types of organisms simultaneously more likely to be listed as NIS.  For example, plastic debris provides comparatively negligible nutritional value to natural debris, while having a much higher surface energy, which may make settlement and maintenance of surface connections more difficult  (Andrady, 2015). Both field and lab studies have shown that differences such as these manifest as significantly different communities on natural and artificial marine debris (Dussud et al., 2018; Muthukrishnan, Al Khaburi, & Abed, 2018; Oberbeckmann, Kreikemeyer, & Labrenz, 2018).
+
+The introduction and establishment patterns of the listed invasive species found on AMD further suggests the influence of biology on their elevated proportion within this community, and perhaps a relationship with marine urban areas. Most of the NIS found on AMD are known to foul the hulls of ships, marine infrastructure, and fishing and aquaculture equipment. Some are so successful at this that their native range is difficult to delineate due to the long history and persistence of their association, in particular, with international shipping, such as XX and XX. Other notable associations with artificial surfaces, such as coastal infrastructure and aquaculture equipment, are shown in the cases of XX, XX, XX, and XX. 
+
+However, this observation could also arise from methodological factors. Shipping, infrastructure, and aquaculture are closely tied with human activities and economies, therefore species associated with them may be more commonly noted in association with economic impacts and harm to the environments humans frequent (Cite). This awareness may lead to more frequent listing as NIS. Listing as an NIS and associated prevention activities, including education and the availability of identification resources, may also result in increased familiarity and ability to identify these species by non-specialists. 
+It was common within the OAAMD for the community to be reported as a value add within tangential studies, particularly studies related to measuring the volume or mass of debris itself. In these cases, it is unlikely that the entire AMD associated community was rigorously catalogued. Increased familiarity with NIS, and external incentives to identify and publish about them, may have increased the frequency at which NIS were reported relative to other taxa in these studies. Misidentifications as NIS may also have occurred in regions with morphologically similar native species, such as XX and XX (Cite) due to non-specialist taxonomic identification methods.
+
+Consideration of these methodological factors adds important context to the increased proportion of NIS found on anthropogenic debris. Within this context, though, there remains a total XX observations of XX unique listed invasive species on AMD. As an introduction vector, AMD may well be facilitating the spread of these listed invasive species. 
+
+The significant relationship between urban areas and NIS on debris items suggests the ability of anthropogenic debris to enable secondary introductions to remote regions. Secondary introductions, or the transport and establishment of new populations of NIS outside of their initial location, significantly increase the difficulty of eliminating exotic species (Cite). This is particularly true when secondary introductions occur outside of known high-risk areas with frequent monitoring, like ports (Cite). The potential of AMD to facilitate passive secondary introductions may require NIS response plans for species known to foul the substrate to broaden their monitoring programs to include nearby regional beaches.  
+
+Longer trips, such as those seen by Carlton et. al when studying debris items from the Japanese tsunami, might be far more likely during similar extreme events when large debris flows are quickly washed offshore. No other study has looked at this effect, although annual events such as monsoon and hurricane seasons may force debris out to sea in similar quantities.  Japanese tsunami debris overall showed XX% NIS among its community, a total of XX taxa, and XXX records of Mytilus galloprovincialis (Cite), the Mediterranean mussel, across XX objects. Similar extreme events could also cause repeated introductions of genetically diverse and sexually mature organisms in a short time span, thereby sharply increasing the likelihood of successful establishment of an exotic species in a new region (Cite). 
+
+In either scenario, AMD shows its potential as a vector for marine organisms to expand outside of their native range, and, potentially, cause ecological and economic harm to coastlines. It creates an abundance of habitat suitable for NIS transported through other, more highly regulated, vectors like shipping and aquaculture. Secondary introductions outside of monitored areas via the AMD vector may require a shift in marine biosecurity protocols and long-distance dispersal aboard AMD presents an entirely novel type of biosecurity threat. This study has established that not only are plastics and other synthetic materials capable of providing habitat to a diverse range of listed pest species, but that these species may be far more likely to be found in the AMD ecosystem.

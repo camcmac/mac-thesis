@@ -16,30 +16,37 @@ knit: (function(input, ...) {
 #####################
 ## thesis metadata ##
 #####################
-title: |
-  `oxforddown`: \
-  An Oxford University Thesis \
-  Template for R Markdown
-author: Author Name
-college: Your College
-university: University of Oxford
-university-logo: templates/beltcrest.pdf
+title: Investigating the role of anthropogenic marine debris in the ecology and biosecurity of global oceans
+title-image: figures/placeholder.png
+author: Cameron McMains
+college: College of Science, Health, Engineering, and Education 
+university: Murdoch University
+university-logo: templates/hbi_mu_logo.pdf
 university-logo-width: 5cm
 submitted-text: A thesis submitted for the degree of
 degree: Doctor of Philosophy
-degreedate: Michaelmas 2018
+degreedate: May 2021
+supervisortext: Supervised by
+supervisornames: Mieghan Bruce, Marnie Campbell, Chad Hewitt, and Justin McDonald
+declaration: |
+  `r paste(readLines("front-and-back-matter/_declaration.Rmd"), collapse = '\n  ')`
 abstract: |
   `r paste(readLines("front-and-back-matter/_abstract.Rmd"), collapse = '\n  ')`
 acknowledgements: |
   `r paste(readLines("front-and-back-matter/_acknowledgements.Rmd"), collapse = '\n  ')`
-dedication: For Yihui Xie
 abbreviations: |
   `r paste(readLines("front-and-back-matter/_abbreviations.Rmd"), collapse = '\n  ')`
+params:
+  width: 70%
 
 #######################
 ## bibliography path ##
 #######################
+#original bibliographies to package
 bibliography: [bibliography/references.bib, bibliography/additional-references.bib]
+
+#personal bibliographies
+#bibliography: [bibliography/intro-ref.bib, bibliography/synth-ref.bib, bibliography/biosec-ref.bib, bibliography/idstudy-ref.bib, bibliography/abm-ref.bib, bibliography/mgmt-ref.bib]
 
 ########################
 ## PDF layout options ###
@@ -57,7 +64,7 @@ word-count: "10,052"
 
 ### abbreviations ###
 abbreviations-width: 3.2cm
-abbreviations-heading: List of Abbreviations
+abbreviations-heading: Glossary
 
 
 ### citation and bibliography style ###
@@ -66,7 +73,7 @@ bibliography-heading-in-pdf: Works Cited
 # biblatex options #
 # unless you run into 'biber' error messages, use natbib as it lets you customise your bibliography directly
 use-biblatex: true
-bib-latex-options: "style=authoryear, sorting=nyt, backend=biber, maxcitenames=2, useprefix, doi=true, isbn=false, uniquename=false" #for science, you might want style=numeric-comp, sorting=none for numerical in-text citation with references in order of appearance
+bib-latex-options: "style=authoryear, sorting=nyt, backend=biber, maxcitenames=3, useprefix, doi=true, isbn=false, uniquename=false" #for science, you might want style=numeric-comp, sorting=none for numerical in-text citation with references in order of appearance
 
 # natbib options #
 # natbib runs into fewer errors than biblatex, but to customise your bibliography you need to fiddle with .bst files
@@ -96,9 +103,9 @@ page-layout: nobind #'nobind' for equal margins (PDF output), 'twoside' for two-
 
 ### position of page numbers ###
 ordinary-page-number-foot-or-head: foot #'foot' puts page number in footer, 'head' in header
-ordinary-page-number-position: C  #C = center, R = right, L = left. If page layout is 'twoside', O = odd pages and E = even pages. E.g. RO,LE puts the page number to the right on odd pages and left on even pages
+ordinary-page-number-position: R  #C = center, R = right, L = left. If page layout is 'twoside', O = odd pages and E = even pages. E.g. RO,LE puts the page number to the right on odd pages and left on even pages
 chapter-page-number-foot-or-head: foot #you may want it to be different on the chapter pages
-chapter-page-number-position: C
+chapter-page-number-position: R
 
 ### position of running header ###
 running-header: true #indicate current chapter/section in header?
@@ -108,12 +115,12 @@ running-header-position-rightmark: RE  #marks the section.
 
 
 ### draft mark ###
-draft-mark: false # add a DRAFT mark?
+draft-mark: true # add a DRAFT mark?
 draft-mark-foot-or-head: foot ##'foot' = in footer, 'head' = in header
 draft-mark-position: C
 
 ### section numbering ###
-section-numbering-depth: 2 # to which depth should headings be numbered?
+section-numbering-depth: 3 # to which depth should headings be numbered?
 
 ### tables of content ###
 toc-depth: 1 # to which depth should headings be included in table of contents?
@@ -133,7 +140,7 @@ frontmatter-linespacing: 17pt plus1pt minus1pt #spacing in roman-numbered pages 
 
 ### other stuff ###
 abstractseparate: false  # include front page w/ abstract for examination schools?
-includeline-num: false #show line numbering in PDF?
+includeline-num: true #show line numbering in PDF?
 line-wrapping-in-code: true #wrap overflowing lines in code blocks?
 
 

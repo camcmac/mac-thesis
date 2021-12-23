@@ -72,6 +72,10 @@
 \newif\ifmasterssubmission
 % adds candidate number and word count in place of name and college
 \masterssubmissionfalse
+% the text introducing supervisors on the title pages
+\def\supervisortext#1{\gdef\@supervisortext{#1}}
+% the names of supervisors on the title pages
+\def\supervisornames#1{\gdef\@supervisornames{#1}}
 
 
 %
@@ -194,18 +198,25 @@
 \else
   \begin{center}
     { \LARGE {\bfseries {\@title}} \par}
-{\large \vspace*{30mm} {\crest \par} \vspace*{25mm}}
+{\large \vspace*{20mm} {\titleimg \par} \vspace*{15mm}}
     {{\Large \@author} \par}
 {\large \vspace*{1ex}
     {{\@college} \par}
 \vspace*{1ex}
     {\university \par}
+\pagebreak[0]
+{\large \vspace*{5mm} {\crest \par} \vspace*{5mm}}
 \vspace*{20mm}
     {{\submittedtext} \par}
 \vspace*{1ex}
     {\it {\@degree} \par}
 \vspace*{2ex}
-    {\@degreedate}}
+    {\@degreedate \par}
+\vspace*{4ex}
+    {\Large \@supervisortext \par}
+\vspace*{1ex}
+    {\@supervisornames}
+    }
   \end{center}
 \fi
   \vfill\null
@@ -218,28 +229,25 @@
 % The dedication environment makes sure the dedication gets its
 % own page and is set out in verse format.
 
-\newenvironment{dedication}
-{\begin{alwayssingle}
-  \thispagestyle{empty}
-  \vspace*{\fill} \begin{center}}
-{\end{center}\vspace*{\fill}\vspace*{\fill} \end{alwayssingle}}
+%\newenvironment{dedication}
+%{\begin{alwayssingle}
+%  \thispagestyle{empty}
+%  \vspace*{\fill} \begin{center}}
+%{\end{center}\vspace*{\fill}\vspace*{\fill} \end{alwayssingle}}
 
-
-% ACKNOWLEDGEMENTS
+% DECLARATION
 %
-% The acknowledgements environment puts a large, bold, centered 
-% "Acknowledgements" label at the top of the page. The acknowledgements
-% themselves appear in a quote environment, i.e. tabbed in at both sides, and
-% on its own page.
+% This section places a large bold Delaration title on a page
+% required by the University that declares that the thesis is 
+% the primary and original work of the individual submitting it.
 
-\newenvironment{acknowledgements}%
-{   \begin{alwayssingle}\chapter*{Acknowledgements}
+\newenvironment{declaration}%
+{   \begin{alwayssingle}\chapter*{Declaration}
     \thispagestyle{empty}
 	\pagestyle{empty}
 	\setlength{\baselineskip}{\frontmatterbaselineskip}
 }
 {\end{alwayssingle}}
-
 
 %ABSTRACT
 %
@@ -284,6 +292,22 @@
    \setlength{\baselineskip}{\abstractseparatelineskip} %UL was \z@ rather than \abstractseparatelineskip
    \setlength{\parskip}{\abstractseparateparskip}} %UL add this line so paragraph skip can be customised
 {\vfill\end{alwayssingle}\restoregeometry}
+
+
+% ACKNOWLEDGEMENTS
+%
+% The acknowledgements environment puts a large, bold, centered 
+% "Acknowledgements" label at the top of the page. The acknowledgements
+% themselves appear in a quote environment, i.e. tabbed in at both sides, and
+% on its own page.
+
+\newenvironment{acknowledgements}%
+{   \begin{alwayssingle}\chapter*{Acknowledgements}
+    \thispagestyle{empty}
+	\pagestyle{empty}
+	\setlength{\baselineskip}{\frontmatterbaselineskip}
+}
+{\end{alwayssingle}}
 
 
 %ROMANPAGES

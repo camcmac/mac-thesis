@@ -1,0 +1,15 @@
+I, Cameron McMains, certify that:
+
+This thesis has been substantially accomplished during enrolment in this degree. It does not contain material that has been submitted for the award of any other degree or diploma in my name, in any university or other tertiary institution. In the future, no part of this thesis will be used in a submission in my name for any other degree or diploma in any university or other tertiary institution without the prior approval of Murdoch University and, where applicable, any partner institution responsible for the joint-award of this degree.
+
+This thesis does not contain any material previously published or written by another person, except where due reference has been made in the text and, where relevant, in the Authorship Declarations that follows. It does not violate or infringe any copyright, trademark, patent, or other rights whatsoever of any person. 
+
+None of the research in this thesis required ethics approval. Approval for field work and research safety was obtained in RAMP No. XXXX. 
+
+This thesis contains published work and work prepared for publication, all of which has involved the co-authors listed in the co-authorship declarations and efforts from others listed in chapter acknowledgement sections.
+
+\begin{flushright}
+Cameron McMains \\
+30 May 2021 \\
+Signed:
+\end{flushright}
