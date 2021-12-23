@@ -107,7 +107,7 @@ Geographic distributions for each species both found in the OAAMD and listed as 
 
 For the purposes of this analysis, material type was summarised into several broad categories based on the more varied assortment reported in the OAAMD. The categories in Table \@ref(tab:materialDefine) represent an attempt to best group within data availability and factors known to influence fouling patterns, such as the tendency of fishing gear to be littered into the environment already fouled (Cite). Material type, when available, was almost always reported at the study level and not attached to records of individual organisms. There were also inconsistencies in the detail used in reporting the type of plastic found. Where material type is described by function, the definitions provided in XX were used (Cite).
 
-```{r materialDefine, echo = F, out.width = params$width, fig.scap = "Material type definitions", fig.cap = "Material type designations used to classify the broader range of materials found in the OAAMD to provide adequate sample sizes in the following statistical analyses."}
+```{r materialDefine, echo = F, out.width = params$width}
 
 matTypes <- c("Plastic", "Fishing gear", "Megastructure", "Fabric", "Glass or ceramic", "Metal", "Other", "Unknown")
 
@@ -124,6 +124,8 @@ matData <- data.frame(matTypes, matDefine)
 
 knitr::kable(matData,
       col.names = c("Material", "Definition"),
+      caption = "Material type designations used to classify the broader range of materials found in the OAAMD to provide adequate sample sizes in the following statistical analyses.",
+      caption.short = "Material type definitions",
       booktabs = T) %>%
   kable_styling(latex_options = "scale_down")
 

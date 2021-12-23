@@ -10,6 +10,8 @@ output:
   bookdown::word_document2: default
 documentclass: book
 bibliography: [bibliography/references.bib]
+#paper level bibliography
+#bibliography: [bibliography/abm-ref.bib]
 params:
   width: 70%
 ---

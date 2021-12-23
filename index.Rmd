@@ -63,7 +63,7 @@ word-count: "10,052"
 # alternative-title-page: templates/alt-title-page-example.tex
 
 ### abbreviations ###
-abbreviations-width: 3.2cm
+abbreviations-width: 6.3cm
 abbreviations-heading: Glossary
 
 

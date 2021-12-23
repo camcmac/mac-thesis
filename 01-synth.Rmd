@@ -10,6 +10,8 @@ output:
   bookdown::word_document2: default
 documentclass: book
 bibliography: [bibliography/references.bib]
+#chapter level bibliography
+#bibliography: [bibliography/synth-ref.bib]
 params:
   width: 70%
 ---

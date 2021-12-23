@@ -10,6 +10,8 @@ output:
   bookdown::word_document2: default
 documentclass: book
 bibliography: [bibliography/references.bib]
+#chapter level bibliography
+#bibliography: [bibliography/intro-ref.bib]
 params:
   width: 70%
 ---
@@ -17,9 +19,10 @@ params:
 # Anthropogenic marine debris as habitat and pathway for range shifts and the introduction of invasive species
 \chaptermark{AMD as habitat and pathway}
 
-> "You can see the old cities, still everywhere, the bones and bricks go to dust, but the little pieces of plastic never do. They never adapt either."
-
-`r tufte::quotefooter(' -- Ursula LeGuin, The Dispossessed')`
+```{block type='savequote', include=knitr::is_latex_output(), quote_author='(ref:leguin-quote)'}
+You can see the old cities, still everywhere, the bones and bricks go to dust, but the little pieces of plastic never do. They never adapt either.
+```
+(ref:leguin-quote) --- Ursula K. LeGuin, _The Dispossessed_
 
 ## Introduction
 

@@ -10,12 +10,19 @@ output:
   bookdown::word_document2: default
 documentclass: book
 bibliography: [bibliography/references.bib]
+#paper level bibliography
+#bibliography: [bibliography/mgmt-ref.bib]
 params:
   width: 70%
 ---
 
 # Implications of anthropogenic marine debris as a pathway for invasive species and recommendations for effective management
 \chaptermark{Managment of AMD as a pathway}
+
+```{block type='savequote', include=knitr::is_latex_output(), quote_author='(ref:banks-quote)'}
+"'Thing about emergencies,' he said, sounding weary. 'Rarely occur when they’d be convenient.'"
+```
+(ref:banks-quote) --- Iain M. Banks, _The Hydrogen Sonata_
 
 
 ## Abstract

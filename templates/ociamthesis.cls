@@ -212,10 +212,10 @@
     {\it {\@degree} \par}
 \vspace*{2ex}
     {\@degreedate \par}
-\vspace*{4ex}
+\vspace*{8ex}
     {\Large \@supervisortext \par}
 \vspace*{1ex}
-    {\@supervisornames}
+    {\bfseries \@supervisornames}
     }
   \end{center}
 \fi
@@ -381,7 +381,7 @@
 \setlength{\textfloatsep}{20pt plus15pt minus4pt}
 
 % JEM: Fix paragraph spacing within quotes for multi-par quotes
-\renewenvironment{savequote}[1][8cm]{%
+\renewenvironment{savequote}[1][11cm]{%
 \begin{lrbox}{\@quotebox}
 \begin{minipage}[t]{#1}\footnotesize\slshape%
 \setlength{\parskip}{6pt}}{%
