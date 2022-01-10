@@ -1,0 +1,5 @@
+﻿name,used,size_range,familiar_items,source,note
+nanoplastic,F,1 to 1000 nanometers,atmospheric plastic,Hartmann2019,measured at longest dimension
+microplastic,T,1 to 1000 micrometers,microbeads in cosmetics; nurdles; beached fragments and flakes,Hartmann2019,measured at longest dimension
+mesoplastic,F,1 to 10 millimeters,bottlecaps; sauce packets,Hartmann2019,measured at longest dimension
+macroplastic,T,1 centimeter and larger,drink bottle; fishing net,Hartmann2019,measured at longest dimension
