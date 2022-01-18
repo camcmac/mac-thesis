@@ -157,19 +157,26 @@ $endfor$
 	\newcommand{\nd}{\textsuperscript{nd}}
 	\renewcommand{\st}{\textsuperscript{st}}
 	\newcommand{\rd}{\textsuperscript{rd}}
+	
+% IP feb 2021: option to include line numbers in PDF
+$if(includeline-num)$
+\usepackage{lineno}
+\linenumbers
+$endif$
+
 
 %%%%% THE ACTUAL DOCUMENT STARTS HERE
 \begin{document}
 
 %%%%% CHOOSE YOUR LINE SPACING HERE
 % This is the official option.  Use it for your submission copy and library copy:
-\setlength{\textbaselineskip}{22pt plus2pt}
+\setlength{\textbaselineskip}{26pt plus2pt}
 % This is closer spacing (about 1.5-spaced) that you might prefer for your personal copies:
 %\setlength{\textbaselineskip}{18pt plus2pt minus1pt}
 
 % UL: You can set the general paragraph spacing here - I've set it to 2pt (was 0) so
 % it's less claustrophobic
-\setlength{\parskip}{2pt plus 1pt}
+\setlength{\parskip}{3pt plus 1pt}
 
 % Leave this line alone; it gets things started for the real document.
 \setlength{\baselineskip}{\textbaselineskip}

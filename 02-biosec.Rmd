@@ -11,6 +11,7 @@ output:
   bookdown::html_document2: default
   bookdown::word_document2: default
 documentclass: book
+includeline-num: true
 params:
   width: 70%
 
@@ -27,43 +28,294 @@ bibliography: [bibliography/references.bib]
 library(knitr)
 library(tidyverse)
 library(kableExtra)
+library(readxl)
+library(flextable)
+library(janitor)
 
 ```
 
-```{r localFunctions, include = F}
+```{r local functions, include = T}
 
-lineBreaks <- function(.text = matDefine, .max_str_length = 30) {
-  
-  objType <- typeof(.text)
-  
-  if (objType == "list") {
-    all_out <- "dummy"
-  } else if (objType == "character") {
-    
-    all_out <- list()
-    
-    for (i in .text) {
-      str_length <- stringr::str_length(i)
-      if (str_length <= .max_str_length) {
-        str_out <- i
-      } else {
-        split_start <- seq(from = 1, to = (str_length - 6), by = .max_str_length)
-        split_end <- c((start_split[-1] - 1), str_length)
-        split_strs <- stringr::str_sub(i, split_start, split_end)
-        need_brks <- split_strs[-length(split_strs)]
-        end_str <- split_strs[length(split_strs)]
-        added_brks <- c(paste0(need_brks, "//-/n"), end_str)
-        str_out <- paste(added_brks, collapse = "")
-        all_out <- "dummy"
-          }
+neg_log1p <- function(x) {
+  if (is.na(x)) {
+    val <- NA
+    }  else {
+      abs_val <- abs(x)
+      val <- ifelse(abs_val == x, log1p(x), log1p(abs_val) * -1)
     }
-  } else {
-    print("Input must be a character vector or dataframe with at least one character column.")
+  return(val)
+}
+
+groupUnivar <- function(x, nbreaks, group_algo) {
+
+  classes <- classInt::classIntervals(x, n = nbreaks, style = group_algo)
+  breaks <- classes[["brks"]]
+  
+  vec <- rep(NA, length(x))
+  
+  for(i in 1:length(vec)) {
+    for(j in 2:length(breaks)) {
+      vec[[i]] <- ifelse(x[[i]] > breaks[[j - 1]] & x[[i]] <= breaks[[j]],
+                         (j - 1),
+                         vec[[i]])
+    }
   }
   
-  return(all_out)
+  vec_max <- ifelse(is.na(vec), length(breaks) * -1, vec)
+  vec_fin <- as.factor(vec_max)
   
+  return(vec_fin)
 }
+
+#file reading and general cleaning function
+readFiles <- function(x) {
+   
+   raw <- read.csv(x)
+   renamed <- clean_names(raw)
+   clean <- mutate_all(renamed, ~ na_if(., ""))
+   columns <- colnames(clean)
+   
+   if(columns[1] == "i_paper_id") {
+     fix <- rename(clean, paper_id = i_paper_id)
+   } else if(columns[1] == "x") {
+     fix <- rename(clean, row_id = x)
+   }
+   else {
+     fix <- clean
+   }
+   
+   if ("i_rank" %in% columns) {
+     out <- rename(fix, rank = i_rank)
+   } else{
+     out <- fix
+   }
+   
+  return(out)
+   
+  }
+
+```
+
+```{r create global variables, include = T}
+
+pal_discrete <- c("#E81268", "#FFA714", "#8DF012", "#1F66C7",
+                  "#FBE3ED", "#FFF6E7", "#F2FDE5", "#E1EAF6",
+                  "#ED5E98", "#FFC566", "#B2F361", "#5F90D3",
+                  "#BA004B", "#D98700", "#6DC500", "#08418F",
+                  "#620027", "#724700", "#396700", "#02214B")
+
+pal_scale <- c("#E81268", "#FBE3ED", "#ED5E98", "#BA004B", "#620027",
+               "#FFA714", "#FFF6E7", "#FFC566", "#D98700", "#724700",
+               "#B2F361")
+
+```
+
+```{r load data, include = F}
+
+#file locations
+file_directory <- "C:/Users/Lal/Documents/PhD/thesis_git/mac-thesis/data/biosec/"
+
+#get names of file in main directory
+file_names <- list.files(file_directory)
+
+#combine to create full addresses of files
+file_addresses <- paste0(file_directory, file_names)
+
+#get names of all data files
+file_labels <- str_remove(file_names, ".csv")
+
+#read and clean files into a list of dataframes
+list_data_files <- file_addresses %>%
+  map(~readFiles(.)) %>%
+  #remove entirely empty rows and columns
+  map(~ remove_empty(.,
+                     which = c("rows",
+                               "cols"))) 
+
+#give the dataframes clean names based on the filename
+names(list_data_files) <- file_labels
+
+#extract dataframes to the environment
+list2env(list_data_files, .GlobalEnv)
+
+```
+
+```{r remove file list, include = F}
+
+rm(list_data_files, file_names, file_labels, file_addresses)
+
+```
+
+```{r create keys, include = F}
+
+#lat long and place key
+place_key <- place_names %>%
+  select(nis_place, lat, long) %>%
+  mutate_at(c(2,3), ~ round(., 2)) %>%
+  distinct()
+
+```
+
+```{r clean spatial data, include = F}
+
+#clean and prepare spatial data
+site_coords <- spatial %>%
+  filter(!is.na(long) & !is.na(lat)) %>%
+  arrange(paper_id, site) %>%
+  mutate(lat = round(as.numeric(lat), 2),
+         long = round(as.numeric(long), 2)) %>%
+  left_join(papers, by = "paper_id") %>%
+  select(paper_id, site, hem, body, lat, long)
+
+```
+
+```{r prep wrims data, include = F}
+
+levels_crypto <- c("Origin uncertain", "Origin unknown")
+levels_monitored <- c("Absent", "Detected in invasion pathway",
+                      "In captivity/cultivated", "Recorded in error")
+levels_introduced <- c("Detected in the wild", "present", "Reported",
+                       "Sometimes present")
+levels_established <- c("Established and expanding", "Established and stable")
+
+
+wrims <- wrims_db %>%
+  #not interested native ranges within WRIMS
+  filter(!str_detect(establishment_means, "Native")) %>% 
+  #not interested in orgs where caused no issue worth noting
+  filter(invasiveness != "Not invasive") %>% 
+  #clarify naming of variables related to organisms status at a location
+  rename(eco_status = establishment_means,
+         nis_status = invasiveness,
+         intro_locality = locality) %>%
+  #clean and correctly designate factor variables
+  mutate_at(c(4:6), ~ as.factor(str_squish(.))) %>%
+  #collapse categorisation into groups meaningful for this analysis
+  mutate(eco_status = fct_collapse(eco_status,
+                                   Cryptogenic = levels_crypto),
+         nis_status = fct_recode(nis_status,
+                                 Invasive = "Management recorded",
+                                 Concern = "Of concern",
+                                 Missing = "Not specified"),
+         occurrence_status = fct_collapse(occurrence_status,
+                                          Monitored = levels_monitored,
+                                          Introduced = levels_introduced,
+                                          Undetermined = c("Uncertain"),
+                                          Established = levels_established,
+                                          Missing = c("Not specified"))
+         ) %>%
+  #take only the earliest year as the event date (all are presented YYYY-MM-DD)
+  mutate(event_date = as.integer(str_sub(event_date, 1, 4))) %>%
+  #designate which records are relevant to this analysis as those which are either
+  #invasive OR which are noted as worth monitoring/managing outside their native range
+  mutate(relevant_record = case_when(nis_status == "Invasive" ~ T,
+                                     nis_status != "Missing" & !occurrence_status %in% c("Missing",
+                                                                                         "Undetermined") ~ T)
+         ) %>%
+  #remove variables irrelevant to this analysis
+  select(-c(occurrence_remarks, country_code, source)) %>%
+  filter(relevant_record == T) %>%
+  mutate_if(is.factor, ~ droplevels(.)) %>%
+  left_join(wrims_countries) %>%
+  filter(nis_status %in% c("Invasive", "Of Concern"))
+
+wrims %>%
+  filter(is.na(intro_region)) %>%
+  select(intro_locality)
+
+#get vector of invasive species
+nis_names <- wrims_db %>%
+  select(scientific_name, accepted_name_usage, invasiveness) %>%
+  distinct() %>%
+  mutate(invasiveness = str_to_lower(invasiveness),
+         invasiveness = str_trim(invasiveness)) %>%
+  filter(invasiveness %in% c("of concern", "invasive", "management recorded")) %>%
+  select(-invasiveness) %>%
+  gather() %>%
+  pull(value) %>%
+  unique()
+
+```
+
+```{r create main dataframe, include = F}
+
+#join organisms and papers into one dataframe
+orgs_papers <- organisms %>%
+  select(-rank) %>%
+  left_join(taxonomy, by = "scientific_name") %>%
+  left_join(papers, by = "paper_id") %>%
+  select(-raw_name) %>%
+  distinct() %>%
+  mutate(nis = ifelse(scientific_name %in% nis_names, T, F)) %>%
+  left_join(select(site_coords, site, paper_id, lat, long)) %>%
+  mutate(lat = round(as.numeric(lat), 2),
+         long = round(as.numeric(long), 2)) %>%
+  left_join(place_key, by = c("lat", "long")) %>%
+  select(paper_id:material, rank:species, year_pub, environ, size, nis, nis_place) %>%
+  distinct()
+
+```
+
+
+```{r subset jtmd papers, include = F}
+
+spatial_jtmd <- site_coords %>%
+  filter(paper_id == 999) %>%
+  mutate(lat = round(as.numeric(lat), 2),
+         long = round(as.numeric(long), 2),
+         site = as.character(site)) %>%
+  select(-c(hem, body)) %>%
+  left_join(select(organisms, -rank), by = c("paper_id", "site")) %>%
+  left_join(taxonomy) %>%
+  left_join(place_key) %>%
+  mutate(nis = ifelse(scientific_name %in% nis_names, T, F)) %>%
+  select(paper_id, rank, scientific_name, kingdom:species, nis,
+         site, lat, long, nis_place) %>%
+  distinct() %>%
+  arrange(paper_id, scientific_name)
+
+table(spatial_jtmd$nis_place)
+
+```
+
+```{r abundance stats, include = F}
+n_orgs_all <- as.numeric(nrow(orgs_papers))
+n_nis_all <- as.numeric(sum(orgs_papers$nis))
+n_species_all <- orgs_papers %>%
+  filter(rank == "Species") %>%
+  nrow() %>%
+  as.numeric()
+
+n_orgs_jtmd <- as.numeric(nrow(spatial_jtmd))
+n_nis_jtmd <- as.numeric(sum(spatial_jtmd$nis))
+n_species_jtmd <- spatial_jtmd %>%
+  filter(rank == "Species") %>%
+  nrow() %>%
+  as.numeric()
+
+pct_nis_all <- round(n_nis_all / n_orgs_all, 4)
+pct_nis_jtmd <- round(n_nis_jtmd / n_orgs_jtmd, 4)
+  
+pct_sp_nis_all <- round(n_nis_all / n_species_all, 4)
+pct_sp_nis_jtmd <- round(n_nis_jtmd / n_species_jtmd, 4)
+```
+
+```{r richness stats, include = F}
+
+richness_ltu <- orgs_papers %>%
+  select(scientific_name) %>%
+  distinct() %>%
+  nrow() %>%
+  as.numeric()
+
+richness_species <- orgs_papers %>%
+  filter(rank == "Species") %>%
+  select(scientific_name) %>%
+  distinct() %>%
+  nrow() %>%
+  as.numeric()
+
+pct_richness_species <- round(richness_species / richness_ltu, 4)
 
 ```
 
@@ -242,7 +494,30 @@ Connection weight was quantified as the number of NIS records in region “A” 
 
 ## Results
 
-Of the (code snip) organisms in the complete database of OAAMD, (code snip) belonged to species listed as an invasive, managed, or concerning species in the World Register of Invasive Marine Species [@Rius2020] (Table (code snip), Supplementary material). Throughout the recorded time-period (1990-2019), the ratio of unique NIS to unique taxa stayed steady at around 5% (Figure 1). Records were concentrated in the NE Pacific Ocean (n = (code snip)), due to the thorough study of debris related to the Japanese tsunami (Carlton et al., 2017). Outside of this study, the next most frequent regions were European territorial waters in the NE Atlantic Ocean (n = (code snip)) and Mediterranean Sea (n = (code snip)). The listed invasive species most frequently found are globally wide-spread and known to have broad environmental tolerances: Mytilus galloprovincialis [@citekey] (n = (code snip)), Megabalanus rosa [@citekey] (n = (code snip)), and Magallana gigas [@citekey] (n = (code snip)). Listed taxa were most common on fishing gear (n = (code snip)) and megastructures (n = (code snip)), the latter primarily associated with Japanese tsunami debris.
+Of the `r n_orgs_all` recorded organisms in the complete database of OAAMD, `r n_nis_all` belonged to species listed as an invasive, managed, or concerning species in the World Register of Invasive Marine Species [@Rius2020] (Table (code snip), Supplementary material). Throughout the recorded time-period (1990-2019), the ratio of unique NIS to unique taxa stayed steady at around 5% (Figure 1). Records were concentrated in the NE Pacific Ocean (n = (code snip)), due to the thorough study of debris related to the Japanese tsunami (Carlton et al., 2017). Outside of this study, the next most frequent regions were European territorial waters in the NE Atlantic Ocean (n = (code snip)) and Mediterranean Sea (n = (code snip)). The listed invasive species most frequently found are globally wide-spread and known to have broad environmental tolerances: Mytilus galloprovincialis [@citekey] (n = (code snip)), Megabalanus rosa [@citekey] (n = (code snip)), and Magallana gigas [@citekey] (n = (code snip)). Listed taxa were most common on fishing gear (n = (code snip)) and megastructures (n = (code snip)), the latter primarily associated with Japanese tsunami debris.
+
+```{r organisms from wrims table, run = F}
+
+test <- wrims_db %>%
+  select(accepted_name_usage, source, country_code, invasiveness, locality) %>%
+  mutate(invasiveness = ifelse(invasiveness %in% c("Invasive", "Of Concern", "Management recorded"),
+                               invasiveness,
+                               "Other"),
+         country_code = str_replace_all(country_code, "England|Scotland", "GB"),
+         country_code = str_replace_all(country_code, "Taiwan", "TW"),
+         continent = countrycode::countrycode(country_code,
+                                            destination = 'continent',
+                                            origin = 'genc2c'),
+         source = str_sub(source, 1, 6),
+         continent = case_when(!is.na(continent) ~ continent,
+                               source == "Katsan" ~ "Europe",
+                               source == "DAISIE" ~ "Europe",
+                               source == "Molnar" ~ "Europe")
+         ) %>%
+  select(-c(source, country_code)) %>%
+  filter(invasiveness != "Other") %>%
+  rename(designation = invasiveness)
+```
 
 Plastics, the most frequently recorded material harbouring associated organisms (n = (code snip)), showed a comparatively low presence (3%) of listed NIS within its associated community (Figure (code snip)). By contrast, items categorised as fabrics (n = (code snip)), showed a very high percentage of NIS within its community. Out of all records related to fabric, 13% were listed NIS, which was a close third behind fishing gear (20%) and megastructures (16%). Few records of NIS were found on hard surfaces like metal (n = (code snip)) or glass and ceramic (n = (code snip)).
 
@@ -292,3 +567,4 @@ Although the substrate of AMD itself is very different from its natural analogue
 ### Conclusion
 
 In either scenario, AMD shows its potential as a pathway for marine organisms to expand outside of their native range, and, potentially, cause ecological and economic harm to coastlines in almost every marine region on Earth. It creates an abundance of habitat suitable for NIS transported through other, more highly regulated, vectors like shipping and aquaculture. Secondary introductions outside of monitored areas via the AMD pathway may require a shift in marine biosecurity protocols and long-distance dispersal aboard AMD presents an entirely novel type of biosecurity threat. This study has established that not only are plastics and other synthetic materials capable of providing habitat to a diverse range of listed pest species (Table (code snip)), but that these species may be far more likely to be found associated with AMD.
+

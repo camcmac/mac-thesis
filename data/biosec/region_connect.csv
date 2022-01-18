@@ -1,0 +1,14 @@
+from,Baltic,E Indian,Mediterranean,NE Atlantic,NE Pacific,NW Atlantic,NW Pacific,SE Atlantic,SE Pacific,South,SW Atlantic,SW Pacific,W Indian
+Baltic,,0,0,1,0,0,0,0,0,0,0,0,0
+E Indian,,,0,0,0,0,1,0,0,1,0,1,1
+Mediterranean,,,,1,0,0,0,0,0,0,0,0,1
+NE Atlantic,,,,,0,1,0,1,0,0,0,0,0
+NE Pacific,,,,,,1,1,0,1,0,0,0,0
+NW Atlantic,,,,,,,0,0,0,0,1,0,0
+NW Pacific,,,,,,,,0,0,0,0,1,0
+SE Atlantic,,,,,,,,,0,1,1,0,1
+SE Pacific,,,,,,,,,,1,1,1,0
+South,,,,,,,,,,,1,1,1
+SW Atlantic,,,,,,,,,,,,0,0
+SW Pacific,,,,,,,,,,,,,0
+W Indian,,,,,,,,,,,,,
