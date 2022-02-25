@@ -3,15 +3,16 @@
 # options for knitting a single chapter #
 #########################################
 
-output:
-  bookdown::pdf_document2:
-    template: templates/brief_template.tex
-    citation_package: biblatex
-    extra_dependencies: ["booktabs"]
-  bookdown::html_document2: default
-  bookdown::word_document2: default
-documentclass: book
-includeline-num: true
+output: word_document
+#  bookdown::pdf_document2:
+#    template: templates/brief_template.tex
+#    citation_package: biblatex
+#    extra_dependencies: ["booktabs"]
+#  bookdown::html_document2: default
+#  bookdown::word_document2: default
+#documentclass: book
+#includeline-num: true
+always_allow_html: true
 params:
   width: 70%
 
@@ -434,7 +435,7 @@ These sources were supplemented, in some cases, by published scientific articles
 
 For the purposes of this analysis, material type was summarised into several broad categories based on the more varied assortment reported in the OAAMD. The categories, described earlier in this chapter, are again summarised in Table \@ref(tab:materialDefine). They represent an attempt to best group within data availability and factors known to influence fouling patterns.
 
-```{r materialDefine, echo = F, out.width = params$width}
+```{r materialDefine, echo = F}
 
 matTypes <- c("Plastic", "Fishing gear", "Megastructure", "Fabric", "Glass or ceramic", "Metal", "Other", "Unknown")
 
