@@ -10,14 +10,15 @@ output:
   bookdown::word_document2: default
 documentclass: book
 bibliography: [bibliography/references.bib]
-#paper level bibliography
-#bibliography: [bibliography/abm-ref.bib]
+#chapter level bibliography
+#bibliography: [bibliography/synth-ref.bib]
 params:
   width: 70%
 ---
 
-# Biofouling impacts on the global circulation of anthropogenic marine debris modelled using a combined approach
-\chaptermark{Impacts of biofouling on circulation of AMD}
+# Trash or treasured habitat? The biological community associated with plastic pollution and other anthropogenic marine debris
+\chaptermark{Biological community of AMD}
+
 
 ## Abstract
 
