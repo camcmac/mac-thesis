@@ -16,9 +16,50 @@ params:
   width: 70%
 ---
 
-# Trash or treasured habitat? The biological community associated with plastic pollution and other anthropogenic marine debris
-\chaptermark{Biological community of AMD}
+# Organisms associated with anthropogenic marine debris reported in the scientific literature globally from 1990 to 2019
+\chaptermark{OAAMD Database}
 
+```{r setup, include = F, }
+library(tidyverse)
+library(janitor)
+library(purrr)
+
+file_location <- '~/PhD/thesis_git/mac-thesis/data/biosec/'
+```
+
+
+```{r load files, include = F, }
+
+pull_dfs <- c("organisms", "papers", "spatial", "taxonomy")
+file_type <- c(".csv")
+
+list_dfs <- pull_dfs %>%
+  map(~ read.csv(paste0(file_location, ., file_type), encoding = "UTF-8")) %>%
+  map(~ na_if(., "")) %>%
+  map(~ remove_empty(., which = c("rows", "cols"))) %>%
+  map(~ janitor::clean_names(.)) %>%
+  map(~ rename_with(., ~str_remove(., "x_u_feff_")))
+  
+names(list_dfs) <- pull_dfs
+
+list2env(list_dfs, envir = globalenv())
+
+organisms_clean <- organisms %>%
+  select(-rank) %>%
+  mutate(scientific_name = fct_recode(as.factor(scientific_name),
+                                      Actiniaria = "Actinaria",
+                                      Amoebophrya = "Amoebophyra"))
+#names need further cleaning
+
+df_orgs <- left_join(organisms_clean, taxonomy)
+
+```
+
+```{r manual table creation, include = F}
+
+
+
+```
 
 ## Abstract
 
