@@ -70,11 +70,11 @@ data_sum_labels <- c(
   "Sample characteristics")
 
 data_sum_values <- c(
-  "Synthetic database, Marine ecology",
+  "Synthetic database - Marine ecology",
   "Taxonomic record",
-  "Specialist identification, Environmental DNA, DNA Sequencing",
+  "Specialist identification - Environmental DNA - DNA Sequencing",
   "Scientific publication DOI",
-  "Spatial coordinates, Lowest taxonomic unit, Substrate material type, Publication year"
+  "Spatial coordinates - Lowest taxonomic unit - Substrate material type - Publication year"
 )
 
 data_sum_table <- data.frame(
@@ -85,104 +85,100 @@ data_sum_table <- data.frame(
 ```
 
 ## Abstract  
-	- How main measurement value is important (e.g. chlorophyll).  
-	- Why it is the choice measurement for that purpose.  
-	- How many records are included of main measurement and the spatiotemporal scope of their collection.  
-	- Primary methods used to collect and process data in source material.  
-	- Brief description of what source was used to find records.  
-	- Where to access the database.  
-	- What the database can be combined with and for which common uses.  
+
+- How main measurement value is important (e.g. chlorophyll).  
+- Why it is the choice measurement for that purpose.  
+- How many records are included of main measurement and the spatiotemporal scope of their collection.  
+- Primary methods used to collect and process data in source material.  
+- Brief description of what source was used to find records.  
+- Where to access the database.  
+- What the database can be combined with and for which common uses.  
 
 ### Corresponding author  
 
-\emph{\textbf{Cameron McMains} c.c.mcmains@gmail.com}  
+Correspondence and requests for materials should be directed to \textbf{C. M. (email: c.c.mcmains@gmail.com)}.  
 
 ```{r data summary table, echo = F, fig.cap = "Summary description of synthetic database", fig.scap = "Database description", width = params$width}
 
-kable(data_sum_table, "latex", booktabs = T) %>%
+kable(data_sum_table, "latex", booktabs = T, col.names = NULL) %>%
   kable_styling(latex_options = "scale_down")
 
 ```
 
 ## Background & Summary  
-	- Relevance of data. Why data exists. Compare to alternatives to metrics stored in data.  
-	- Caveats to using the data. Types of data used alongside for analyses/ context.  
-	- General trends in data and their biological origin.  
-	- Example of these trends.  
-	- Importance of outliers and other patterns in data to the users/collectors of it.  
-	- Example of program/project that relies on the data.  
-	- Alternative, less important origins for trends in the data.  
-	- Describe what data is present.  
-	- Describe where the data came from: organisations, projects, people.  
-	- Figure explaining data collection process.  
-	- Suggestion for pre-processing needed prior to using the data for various applications.  
-	- Anywhere else the data is offered.  
-	- Describe any ongoing updates or maintenance to that dataset. 
-	- Explain link between static set and that set.  
+- Relevance of data. Why data exists. Compare to alternatives to metrics stored in data.  
+- Caveats to using the data. Types of data used alongside for analyses/ context.  
+- General trends in data and their biological origin.  
+- Example of these trends.  
+- Importance of outliers and other patterns in data to the users/collectors of it.  
+- Example of program/project that relies on the data.  
+- Alternative, less important origins for trends in the data.  
+- Describe what data is present.  
+- Describe where the data came from: organisations, projects, people.  
+- Figure explaining data collection process.  
+- Suggestion for pre-processing needed prior to using the data for various applications.  
+- Anywhere else the data is offered.  
+- Describe any ongoing updates or maintenance to that dataset. 
+- Explain link between static set and that set.  
 
 ## Methods  
-	- Overview of methods used to collect the field data.  
-	- Explain where to find examples of each general method or a review paper describing various methods in detail.  
-	- Overview of most common methods to process the field data.  
-	- Brief comparison of these methods.  
-	- Mention of other methods possible to use but not included in the dataset and description of reason why they were excluded.  
-	- Describe how methods many be affected by different common scenarios that present in the field and lab.  
-	- Delineate sources of data compiled into the database.  
-	- Describe how data were accessed.  
-	- Describe how data was filtered for relevancy.  
-	- Describe how data was made to fit into a standardised data resource.  
-	- Describe how ongoing maintenance or updating would be performed.  
+- Overview of methods used to collect the field data.  
+- Explain where to find examples of each general method or a review paper describing various methods in detail.  
+- Overview of most common methods to process the field data.  
+- Brief comparison of these methods.  
+- Mention of other methods possible to use but not included in the dataset and description of reason why they were excluded.  
+- Describe how methods many be affected by different common scenarios that present in the field and lab.  
+- Delineate sources of data compiled into the database.  
+- Describe how data were accessed.  
+- Describe how data was filtered for relevancy.  
+- Describe how data was made to fit into a standardised data resource.  
+- Describe how ongoing maintenance or updating would be performed.  
 
 ### Figures  
-	- Map of records in database  
-	- Record availability over time in a bar graph with a broad categorizing variable used for color  
-	- Diagram of process from data collection to final database.  
+- Map of records in database  
+- Record availability over time in a bar graph with a broad categorizing variable used for color  
+- Diagram of process from data collection to final database.  
 
 ## Data Records  
-	- Define the lowest level of record and what it describes (include def of identifier)  
-	- Describe how lowest records are linked through to other levels.  
-	- Describe highest level of record and why it collects the lower levels.  
-	- How metadata is linked to the dataset.  
-	- Any caveats to the above, like why multiple names of a species might be attached to a record.  
-	- Quality assurances for each record and how they were validated.  
+- Define the lowest level of record and what it describes (include def of identifier)  
+- Describe how lowest records are linked through to other levels.  
+- Describe highest level of record and why it collects the lower levels.  
+- How metadata is linked to the dataset.  
+- Any caveats to the above, like why multiple names of a species might be attached to a record.  
+- Quality assurances for each record and how they were validated.  
 
 ## Technical Validation  
-	- How data was cleaned and prepared in a way that needs to be acknowledged in any analysis.  
-	- How data quality issues were addressed in the records that were lower quality but still met the minimum standards to be included.  
-	- Any conversions of preparations that may be confusion to a user at first.  
-	- Null or missing value signifiers.  
+- How data was cleaned and prepared in a way that needs to be acknowledged in any analysis.  
+- How data quality issues were addressed in the records that were lower quality but still met the minimum standards to be included.  
+- Any conversions of preparations that may be confusion to a user at first.  
+- Null or missing value signifiers.  
 
 ## Usage Notes  
-	- Where the data has been made available for use.  
-	- Suggest complementary datasets.  
-	- Suggest how to link the data through to those complementary sets.  
-	- Examples of how this type of data has been used in projects or publications in combination with other sources.  
-	- Common reasons that the dataset admin would be contacted.  
-	- How to contact the dataset admin.  
-	- Where to go for more information about the dataset.  
+- Where the data has been made available for use.  
+- Suggest complementary datasets.  
+- Suggest how to link the data through to those complementary sets.  
+- Examples of how this type of data has been used in projects or publications in combination with other sources.  
+- Common reasons that the dataset admin would be contacted.  
+- How to contact the dataset admin.  
+- Where to go for more information about the dataset.  
 
-## Data Citation  
-\emph{citation of dataset in stable repository}
+### Data Citation  
+\emph{citation of dataset in stable repository}  
 
-- Acknoledgements  
-	- Broad acknowledgment of data providers and collectors.  
-	- How to cite using info from this dataset (e.g. if single, cite source. if multi, cite dataset).  
-	- Encourage engagement with source material.  
-	- Where to find specific acknowledgements of sources.  
-	- Specific requirements in using specific subsets of the data (e.g. JTMD).  
+### Acknowledgements  
+The records synthesised in this database were collected and described through the efforts of academic scientists and researchers, community scientists, and scientific professionals from around the world. We acknowledge their contributions to the body of knowledge compiled in this database and encourage further engagement with their published literature in our citation list. Where records from only one publication are used in continuing research, we recommend citing the publication directly or per the custodian's information. In the case where records from multiple sources were used from this database, this publication should be cited directly. This provenance can be determined using the publication identifier linked to every record in the database. For data originating from the Japanese Tsunami Marine Debris database, the work of Carlton et. al should be cited directly or in addition to this database.  
 
-- Author Contributions  
-	- Which author performed which function in the creation of the dataset and paper.  
-	- Where to reference to get more specific description of contributions.  
+### Author Contributions  
+C.M. designed the methodology, performed all steps of the compilation and preparation of this database, and wrote the manuscript.  C.L.H. and M.L.C. advised on the database synthesis. M.B. and C.L.H. provided significant assistance with and review of the manuscript. J.M. and M.L.C. also assisted with the manuscript review. Further details on author contributions can be found in Table 1 provided with the online version of this manuscript.  
 
-- Additional Information  
-	- Any tables, figures, or support material only available online or from a certain source.  
+### Additional Information  
+Table 1 is only available in the online version of this paper.  
 
-- Competing Interests  
-	- None.  
+\textbf{Competing Interests}  
+The authors declare no competing financial interests.  
 
-- Appendices  
-	- Table of detailed description of each authors contribution.  
+\textbf{Appendices}  
+Create a table of detailed description of each authors contribution per the publisher's requirements.  
 
 
 
