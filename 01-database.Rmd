@@ -14,27 +14,28 @@ bibliography: [bibliography/references.bib]
 #bibliography: [bibliography/synth-ref.bib]
 params:
   width: 70%
+  in_loc: '~/PhD/thesis_git/mac-thesis/data/biosec/'
+  fig_out: '~/PhD/thesis_git/mac-thesis/figures/chapter-figs/database'
 ---
 
-# Organisms associated with anthropogenic marine debris reported in the scientific literature globally from 1990 to 2019
+# Organisms associated with anthropogenic marine debris reported in the scientific literature globally from 1990 to 2019  
 \chaptermark{OAAMD Database}
 
 ```{r setup, include = F, }
 library(tidyverse)
 library(janitor)
 library(purrr)
-
-file_location <- '~/PhD/thesis_git/mac-thesis/data/biosec/'
+library(kableExtra)
 ```
 
 
-```{r load files, include = F, }
+```{r load files, include = F}
 
 pull_dfs <- c("organisms", "papers", "spatial", "taxonomy")
 file_type <- c(".csv")
 
 list_dfs <- pull_dfs %>%
-  map(~ read.csv(paste0(file_location, ., file_type), encoding = "UTF-8")) %>%
+  map(~ read.csv(paste0(params$in_loc, ., file_type), encoding = "UTF-8")) %>%
   map(~ na_if(., "")) %>%
   map(~ remove_empty(., which = c("rows", "cols"))) %>%
   map(~ janitor::clean_names(.)) %>%
@@ -43,6 +44,10 @@ list_dfs <- pull_dfs %>%
 names(list_dfs) <- pull_dfs
 
 list2env(list_dfs, envir = globalenv())
+
+```
+
+```{r prep data, include = F}
 
 organisms_clean <- organisms %>%
   select(-rank) %>%
@@ -55,120 +60,129 @@ df_orgs <- left_join(organisms_clean, taxonomy)
 
 ```
 
-```{r manual table creation, include = F}
+```{r create database summary, include = F}
 
+data_sum_labels <- c(
+  "Design type(s)",
+  "Measurement type(s)",
+  "Technology type(s)",
+  "Factor type(s)",
+  "Sample characteristics")
 
+data_sum_values <- c(
+  "Synthetic database, Marine ecology",
+  "Taxonomic record",
+  "Specialist identification, Environmental DNA, DNA Sequencing",
+  "Scientific publication DOI",
+  "Spatial coordinates, Lowest taxonomic unit, Substrate material type, Publication year"
+)
+
+data_sum_table <- data.frame(
+  "Descriptor" = data_sum_labels,
+  "Value" = data_sum_values
+  )
 
 ```
 
-## Abstract
-	- How main measurement value is important (e.g. chlorophyll).
-	- Why it is the choice measurement for that purpose.
-	- How many records are included of main measurement and the spatiotemporal scope of their collection.
-	- Primary methods used to collect and process data in source material.
-	- Brief description of what source was used to find records.
-	- Where to access the database.
-	- What the database can be combined with and for which common uses.
+## Abstract  
+	- How main measurement value is important (e.g. chlorophyll).  
+	- Why it is the choice measurement for that purpose.  
+	- How many records are included of main measurement and the spatiotemporal scope of their collection.  
+	- Primary methods used to collect and process data in source material.  
+	- Brief description of what source was used to find records.  
+	- Where to access the database.  
+	- What the database can be combined with and for which common uses.  
 
-### Corresponding author
+### Corresponding author  
 
-```{r data summary table, echo = F}
+\emph{\textbf{Cameron McMains} c.c.mcmains@gmail.com}  
 
+```{r data summary table, echo = F, fig.cap = "Summary description of synthetic database", fig.scap = "Database description", width = params$width}
 
-
-
+kable(data_sum_table, "latex", booktabs = T) %>%
+  kable_styling(latex_options = "scale_down")
 
 ```
-- Tables
-	- Summary table containing
-		- design type(s): what type of database is it and why was it assembled
-		- measurement type(s): what is the main measurement (eg. chlorophyll)
-		- technology type(s): what technology was used to collect the data (e.g. spectroscopy)
-		- factor type(s): how main measurement is primarily grouped
-		- sample characteristic(s): other measurements in the dataset
 
-- Background & Summary
-	- Relevance of data. Why data exists. Compare to alternatives to metrics stored in data. 
-	- Caveats to using the data. Types of data used alongside for analyses/ context.
-	- General trends in data and their biological origin.
-	- Example of these trends. 
-	- Importance of outliers and other patterns in data to the users/collectors of it.
-	- Example of program/project that relies on the data.
-	- Alternative, less important origins for trends in the data. 
-	- Describe what data is present.
-	- Describe where the data came from: organisations, projects, people.
-	- Figure explaining data collection process.
-	- Suggestion for pre-processing needed prior to using the data for various applications. 
-	- Anywhere else the data is offered.
+## Background & Summary  
+	- Relevance of data. Why data exists. Compare to alternatives to metrics stored in data.  
+	- Caveats to using the data. Types of data used alongside for analyses/ context.  
+	- General trends in data and their biological origin.  
+	- Example of these trends.  
+	- Importance of outliers and other patterns in data to the users/collectors of it.  
+	- Example of program/project that relies on the data.  
+	- Alternative, less important origins for trends in the data.  
+	- Describe what data is present.  
+	- Describe where the data came from: organisations, projects, people.  
+	- Figure explaining data collection process.  
+	- Suggestion for pre-processing needed prior to using the data for various applications.  
+	- Anywhere else the data is offered.  
 	- Describe any ongoing updates or maintenance to that dataset. 
-	- Explain link between static set and that set.
+	- Explain link between static set and that set.  
 
-- Methods
-	- Overview of methods used to collect the field data.
-	- Explain where to find examples of each general method or a review paper describing various methods in detail. 
-	- Overview of most common methods to process the field data. 
-	- Brief comparison of these methods.
-	- Mention of other methods possible to use but not included in the dataset and description of reason why they were excluded. 
-	- Describe how methods many be affected by different common scenarios that present in the field and lab.
-	- Delineate sources of data compiled into the database.
-	- Describe how data were accessed.
-	- Describe how data was filtered for relevancy.
-	- Describe how data was made to fit into a standardised data resource.
-	- Describe how ongoing maintenance or updating would be performed.
+## Methods  
+	- Overview of methods used to collect the field data.  
+	- Explain where to find examples of each general method or a review paper describing various methods in detail.  
+	- Overview of most common methods to process the field data.  
+	- Brief comparison of these methods.  
+	- Mention of other methods possible to use but not included in the dataset and description of reason why they were excluded.  
+	- Describe how methods many be affected by different common scenarios that present in the field and lab.  
+	- Delineate sources of data compiled into the database.  
+	- Describe how data were accessed.  
+	- Describe how data was filtered for relevancy.  
+	- Describe how data was made to fit into a standardised data resource.  
+	- Describe how ongoing maintenance or updating would be performed.  
 
-- Figures
-	- Map of records in database
-	- Record availability over time in a bar graph with a broad categorizing variable used for color
-	- Diagram of process from data collection to final database.
+### Figures  
+	- Map of records in database  
+	- Record availability over time in a bar graph with a broad categorizing variable used for color  
+	- Diagram of process from data collection to final database.  
 
-- Data Records
-	- Define the lowest level of record and what it describes (include def of identifier)
-	- Describe how lowest records are linked through to other levels.
-	- Describe highest level of record and why it collects the lower levels.
-	- How metadata is linked to the dataset.
-	- Any caveats to the above, like why multiple names of a species might be attached to a record.
-	- Quality assurances for each record and how they were validated.
+## Data Records  
+	- Define the lowest level of record and what it describes (include def of identifier)  
+	- Describe how lowest records are linked through to other levels.  
+	- Describe highest level of record and why it collects the lower levels.  
+	- How metadata is linked to the dataset.  
+	- Any caveats to the above, like why multiple names of a species might be attached to a record.  
+	- Quality assurances for each record and how they were validated.  
 
-- Technical Validation
-	- How data was cleaned and prepared in a way that needs to be acknowledged in any analysis.
-	- How data quality issues were addressed in the records that were lower quality but still met the minimum standards to be included.
-	- Any conversions of preparations that may be confusion to a user at first.
-	- Null or missing value signifiers.
+## Technical Validation  
+	- How data was cleaned and prepared in a way that needs to be acknowledged in any analysis.  
+	- How data quality issues were addressed in the records that were lower quality but still met the minimum standards to be included.  
+	- Any conversions of preparations that may be confusion to a user at first.  
+	- Null or missing value signifiers.  
 
-- Usage Notes
-	- Where the data has been made available for use.
-	- Suggest complementary datasets.
-	- Suggest how to link the data through to those complementary sets.
-	- Examples of how this type of data has been used in projects or publications in combination with other sources.
-	- Common reasons that the dataset admin would be contacted.
-	- How to contact the dataset admin.
-	- Where to go for more information about the dataset.
+## Usage Notes  
+	- Where the data has been made available for use.  
+	- Suggest complementary datasets.  
+	- Suggest how to link the data through to those complementary sets.  
+	- Examples of how this type of data has been used in projects or publications in combination with other sources.  
+	- Common reasons that the dataset admin would be contacted.  
+	- How to contact the dataset admin.  
+	- Where to go for more information about the dataset.  
 
-- References
-	- bibliography
+## Data Citation  
+\emph{citation of dataset in stable repository}
 
-- Data Citation
-	- citation of dataset in stable repository
+- Acknoledgements  
+	- Broad acknowledgment of data providers and collectors.  
+	- How to cite using info from this dataset (e.g. if single, cite source. if multi, cite dataset).  
+	- Encourage engagement with source material.  
+	- Where to find specific acknowledgements of sources.  
+	- Specific requirements in using specific subsets of the data (e.g. JTMD).  
 
-- Acknoledgements
-	- Broad acknowledgment of data providers and collectors.
-	- How to cite using info from this dataset (e.g. if single, cite source. if multi, cite dataset).
-	- Encourage engagement with source material.
-	- Where to find specific acknowledgements of sources.
-	- Specific requirements in using specific subsets of the data (e.g. JTMD).
+- Author Contributions  
+	- Which author performed which function in the creation of the dataset and paper.  
+	- Where to reference to get more specific description of contributions.  
 
-- Author Contributions
-	- Which author performed which function in the creation of the dataset and paper.
-	- Where to reference to get more specific description of contributions.
+- Additional Information  
+	- Any tables, figures, or support material only available online or from a certain source.  
 
-- Additional Information
-	- Any tables, figures, or support material only available online or from a certain source.
+- Competing Interests  
+	- None.  
 
-- Competing Interests
-	- None.
-
-- Appendices
-	- Table of detailed description of each authors contribution.
+- Appendices  
+	- Table of detailed description of each authors contribution.  
 
 
 
