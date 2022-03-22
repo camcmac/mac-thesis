@@ -58,6 +58,11 @@ organisms_clean <- organisms %>%
 
 df_orgs <- left_join(organisms_clean, taxonomy)
 
+spatial <- spatial %>%
+  mutate(lat = as.numeric(str_remove(lat, ",")),
+         long = as.numeric(str_remove(long, ","))) %>%
+  filter(!is.na(lat))
+
 ```
 
 ```{r create database summary, include = F}
@@ -135,9 +140,79 @@ kable(data_sum_table, "latex", booktabs = T, col.names = NULL) %>%
 - Describe how ongoing maintenance or updating would be performed.  
 
 ### Figures  
-- Map of records in database  
-- Record availability over time in a bar graph with a broad categorizing variable used for color  
-- Diagram of process from data collection to final database.  
+
+```{r buffer function, include = F}
+
+addBuffer <- function(.num_vec, .buffer) {
+  out_vec <- c()
+    for (i in .num_vec) {
+      if (i <= 0) {
+        out <- i - .buffer
+        } else {
+          out <- i + .buffer
+          }
+      out_vec <- c(out_vec, out)
+      }
+  return(out_vec)
+  }
+
+```
+
+```{r prep map data, include = F}
+
+map_buffer <- 2
+lat_lims <- c(min(spatial$lat), max(spatial$lat))
+long_lims <- c(min(spatial$long), max(spatial$long))
+
+map_bounds <- data.frame(lon = c(long_lims[1],
+                                 rep(long_lims[2], 2),
+                                 long_lims[1]),
+                         lat = c(rep(lat_lims[1], 2),
+                                 rep(lat_lims[2], 2)
+                                 )
+                         ) %>%
+  mutate_all(~addBuffer(., map_buffer)) %>%
+  mutate_all(~round(., 1))
+
+map_data <- spatial %>%
+  mutate(spot_id = ifelse(paper_id == 999, site, paper_id)) %>%
+  select(paper_id, spot_id, lat, long) %>%
+  mutate(lat = round(lat, 1),
+         long = round(long, 1)) %>%
+  distinct() %>%
+  left_join(select(papers, paper_id, environ)) %>%
+  mutate(environ = str_replace_all(environ, "Benthic \\[Deep\\]", "Benthic"),
+         environ = str_replace_all(environ, "Benthic; Benthic", "Benthic"),
+         environ = str_replace_all(environ, "Beach; Benthic; Floating", "All"),
+         environ = str_replace_all(environ, "Floating; Benthic", "Benthic; Floating"),
+         environ = str_replace_all(environ, "Floating; Beach", "Beach; Floating"),
+         environ = str_replace_all(environ, ";", " \\&")) %>%
+  select(lat, long, environ)
+
+```
+
+```{r map of records, echo = F, width = params$width, fig.cap = "Global distribution of sampling sites within publications describing organisms associated with AMD.", fig.scap = "Map of database sampling sites"}
+
+library(ggOceanMaps)
+
+basemap(limits = map_bounds) +
+  geom_point(data = transform_coord(map_data),
+             mapping = aes(y = lat, x = long, color = environ, fill = environ),
+             shape = 21, alpha = 0.5, size = 3)
+
+```
+
+```{r yearly records, echo = F, width = params$width, fig.cap = "Yearly counts of publications and records of identified organisms on AMD in the scientific literature.", fig.scap = "Database publications & records by year"}
+
+
+
+```
+
+```{r diagram of process, include = F, width = params$width, fig.cap = "Diagram of the process used to gather and integrate publised records of organisms associated with AMD into the database.", fig.scap = "Database creation process diagram"}
+
+
+
+```
 
 ## Data Records  
 - Define the lowest level of record and what it describes (include def of identifier)  
