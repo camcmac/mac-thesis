@@ -26,6 +26,7 @@ library(tidyverse)
 library(janitor)
 library(purrr)
 library(kableExtra)
+library(ggOceanMaps)
 ```
 
 
@@ -164,21 +165,20 @@ map_buffer <- 2
 lat_lims <- c(min(spatial$lat), max(spatial$lat))
 long_lims <- c(min(spatial$long), max(spatial$long))
 
-map_bounds <- data.frame(lon = c(long_lims[1],
-                                 rep(long_lims[2], 2),
-                                 long_lims[1]),
-                         lat = c(rep(lat_lims[1], 2),
-                                 rep(lat_lims[2], 2)
-                                 )
-                         ) %>%
+map_bounds <- data.frame(lon = c(rep(long_lims[1],2),
+                                 rep(long_lims[2], 2)),
+                         lat = c(lat_lims[1],
+                                 rep(lat_lims[2], 2),
+                                 lat_lims[1])) %>%
   mutate_all(~addBuffer(., map_buffer)) %>%
-  mutate_all(~round(., 1))
+  mutate_all(~round(., 1)) %>%
+  mutate_all(~as.numeric(.))
 
 map_data <- spatial %>%
   mutate(spot_id = ifelse(paper_id == 999, site, paper_id)) %>%
   select(paper_id, spot_id, lat, long) %>%
   mutate(lat = round(lat, 1),
-         long = round(long, 1)) %>%
+         lon = round(long, 1)) %>%
   distinct() %>%
   left_join(select(papers, paper_id, environ)) %>%
   mutate(environ = str_replace_all(environ, "Benthic \\[Deep\\]", "Benthic"),
@@ -187,30 +187,93 @@ map_data <- spatial %>%
          environ = str_replace_all(environ, "Floating; Benthic", "Benthic; Floating"),
          environ = str_replace_all(environ, "Floating; Beach", "Beach; Floating"),
          environ = str_replace_all(environ, ";", " \\&")) %>%
-  select(lat, long, environ)
+  select(lat, lon, environ)
 
 ```
 
-```{r map of records, echo = F, width = params$width, fig.cap = "Global distribution of sampling sites within publications describing organisms associated with AMD.", fig.scap = "Map of database sampling sites"}
+```{r map of records, echo = F, fig.cap = "Global distribution of sampling sites within publications describing organisms associated with AMD.", fig.scap = "Map of database sampling sites", fig.height = 4, fig.width = 5.5}
 
-library(ggOceanMaps)
-
-basemap(limits = map_bounds) +
-  geom_point(data = transform_coord(map_data),
-             mapping = aes(y = lat, x = long, color = environ, fill = environ),
-             shape = 21, alpha = 0.5, size = 3)
+basemap(data = map_bounds, lat.interval = 30,
+        land.col = 'grey95', land.border.col = "grey95", land.size = 0.1) +
+  geom_point(data = map_data,
+             mapping = aes(y = lat, x = lon, color = environ, fill = environ),
+             shape = 21, alpha = 0.5, size = 1.5) +
+  labs(x = "Longitude",
+       y = "Latitude") +
+  scale_fill_manual(name = "Collection\nenvironment",
+                    values = RColorBrewer::brewer.pal(7, "Accent")) +
+  scale_color_manual(name = "Collection\nenvironment",
+                    values = RColorBrewer::brewer.pal(7, "Accent")) +
+  theme(panel.background = element_rect(fill = "grey30"),
+        panel.grid.major = element_line(color = "grey15", size = 0.5),
+        panel.ontop = F,
+        legend.title = element_text(face = "bold"),
+        legend.key = element_rect(fill = "grey30", color = "black"))
 
 ```
 
-```{r yearly records, echo = F, width = params$width, fig.cap = "Yearly counts of publications and records of identified organisms on AMD in the scientific literature.", fig.scap = "Database publications & records by year"}
+```{r prep records data, include = F}
 
+taxon_micro <- c("Bacteria", "Archaea", "Eukaryota", "Protozoa", "Metazoa",
+                 "Fungi", "Gastrotricha", "Loricifera")
+taxon_photo <- c("Plantae", "Chromista")
+taxon_worm <- c("Annelida", "Nemertea", "Platyhelminthes", "Sipuncula", "Chaetognatha")
+taxon_biofoul <- c("Bryozoa", "Cnidaria", "Echinodermata", "Entoprocta", "Porifera",
+                   "Ascidiacea")
+taxon_other <- c("Ctenophora", "Nematoda", "Priapulida", "Actinopterygii", "Elasmobranchii",
+                 "Teleostei")
 
+record_df <- df_orgs %>%
+  mutate(taxon_group = ifelse(kingdom == "Animalia", phylum, kingdom),
+         taxon_group = ifelse(taxon_group == "Chordata", class, taxon_group),
+         taxon_group = factor(taxon_group),
+         taxon_group = fct_collapse(taxon_group,
+                                    Microbial = taxon_micro,
+                                    Photosynthetic = taxon_photo,
+                                    Worm = taxon_worm,
+                                    Biofouling = taxon_biofoul,
+                                    Other = taxon_other,
+                                    Mollusk = "Mollusca",
+                                    Arthropod = "Arthropoda"),
+         taxon_group = fct_explicit_na(taxon_group, "Other")) %>%
+  group_by(paper_id, taxon_group) %>%
+  count() %>%
+  left_join(select(papers, paper_id, year_pub)) %>%
+  ungroup() %>%
+  mutate(year_pub = as.numeric(ifelse(paper_id == "999", 2022, year_pub))) %>%
+  group_by(year_pub, taxon_group) %>%
+  summarise(taxon_count = sum(n)) %>%
+  ungroup()
+
+```
+
+```{r yearly records, echo = F, fig.cap = "Yearly counts of publications and records of identified organisms on AMD in the scientific literature.", fig.scap = "Database publications & records by year", fig.width = 6.5, fig.height = 3.5}
+
+record_df %>%
+  filter(year_pub != 2022) %>%
+  ggplot() +
+  geom_bar(aes(x = year_pub, y = taxon_count, fill = taxon_group),
+           color = "black", size = 0.6, stat = "identity", width = 0.5,
+           na.rm = T, alpha = 0.7) +
+  theme_minimal() +
+  guides(fill = guide_legend(title = "Taxonomic\nGroup", nrow = 1)) +
+  theme(legend.position = "top", 
+        legend.title = element_text(face = "bold", size = rel(0.8)),
+        legend.text = element_text(size = rel(0.8)),
+        legend.key.size = unit(5, "points"),
+        axis.text.y = element_text(size = rel(0.8)),
+        axis.text.x = element_text(angle = 30, hjust = 1, size = rel(0.8)),
+        axis.title = element_text(size = rel(0.9))) +
+  scale_x_continuous(limits = c(1994.1, 2019.9), breaks = scales::breaks_width(1),
+                     expand = expansion(0)) +
+  labs(x = "Year Published",
+       y = "Count of Organisms Recorded")
 
 ```
 
 ```{r diagram of process, include = F, width = params$width, fig.cap = "Diagram of the process used to gather and integrate publised records of organisms associated with AMD into the database.", fig.scap = "Database creation process diagram"}
 
-
+diagram_loc 
 
 ```
 
