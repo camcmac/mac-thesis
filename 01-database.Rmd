@@ -21,7 +21,7 @@ params:
 # Organisms associated with anthropogenic marine debris reported in the scientific literature globally from 1990 to 2019  
 \chaptermark{OAAMD Database}
 
-```{r setup, include = F, }
+```{r setup, include = F}
 library(tidyverse)
 library(janitor)
 library(purrr)
@@ -29,8 +29,7 @@ library(kableExtra)
 library(ggOceanMaps)
 ```
 
-
-```{r load files, include = F}
+```{r load-files, include = F}
 
 pull_dfs <- c("organisms", "papers", "spatial", "taxonomy")
 file_type <- c(".csv")
@@ -48,7 +47,7 @@ list2env(list_dfs, envir = globalenv())
 
 ```
 
-```{r prep data, include = F}
+```{r prep-data, include = F}
 
 organisms_clean <- organisms %>%
   select(-rank) %>%
@@ -66,7 +65,7 @@ spatial <- spatial %>%
 
 ```
 
-```{r create database summary, include = F}
+```{r create-database-summary, include = F}
 
 data_sum_labels <- c(
   "Design type(s)",
@@ -104,9 +103,10 @@ data_sum_table <- data.frame(
 
 Correspondence and requests for materials should be directed to \textbf{C. M. (email: c.c.mcmains@gmail.com)}.  
 
-```{r data summary table, echo = F, fig.cap = "Summary description of synthetic database", fig.scap = "Database description", width = params$width}
+```{r summary-table, echo = F, fig.scap = "Database description", out.width = params$width}
 
-kable(data_sum_table, "latex", booktabs = T, col.names = NULL) %>%
+kable(data_sum_table, "latex", booktabs = T, col.names = NULL,
+      caption = "Summary description of synthetic database") %>%
   kable_styling(latex_options = "scale_down")
 
 ```
@@ -142,7 +142,7 @@ kable(data_sum_table, "latex", booktabs = T, col.names = NULL) %>%
 
 ### Figures  
 
-```{r buffer function, include = F}
+```{r buffer-function, include = F}
 
 addBuffer <- function(.num_vec, .buffer) {
   out_vec <- c()
@@ -159,7 +159,7 @@ addBuffer <- function(.num_vec, .buffer) {
 
 ```
 
-```{r prep map data, include = F}
+```{r prep-map-data, include = F}
 
 map_buffer <- 2
 lat_lims <- c(min(spatial$lat), max(spatial$lat))
@@ -191,7 +191,7 @@ map_data <- spatial %>%
 
 ```
 
-```{r map of records, echo = F, fig.cap = "Global distribution of sampling sites within publications describing organisms associated with AMD.", fig.scap = "Map of database sampling sites", fig.height = 4, fig.width = 5.5}
+```{r map-records, echo = F, fig.cap = "Global distribution of sampling sites within publications describing organisms associated with AMD.", fig.scap = "Map of database sampling sites", fig.height = 4, fig.width = 5.5, warning = F, error = F, message = F}
 
 basemap(data = map_bounds, lat.interval = 30,
         land.col = 'grey95', land.border.col = "grey95", land.size = 0.1) +
@@ -212,51 +212,104 @@ basemap(data = map_bounds, lat.interval = 30,
 
 ```
 
-```{r prep records data, include = F}
+```{r group-taxa, include = F}
 
-taxon_micro <- c("Bacteria", "Archaea", "Eukaryota", "Protozoa", "Metazoa",
-                 "Fungi", "Gastrotricha", "Loricifera")
-taxon_photo <- c("Plantae", "Chromista")
-taxon_worm <- c("Annelida", "Nemertea", "Platyhelminthes", "Sipuncula", "Chaetognatha")
-taxon_biofoul <- c("Bryozoa", "Cnidaria", "Echinodermata", "Entoprocta", "Porifera",
-                   "Ascidiacea")
-taxon_other <- c("Ctenophora", "Nematoda", "Priapulida", "Actinopterygii", "Elasmobranchii",
-                 "Teleostei")
+morpho_list <- tibble(
+    Kingdom = list(
+      Group = list(
+        Microbial = list(Taxon = list("Bacteria", "Archaea", "Eukaryota", "Protozoa", "Metazoa", "Fungi")),
+        Photosynthetic = list(Taxon = list("Plantae", "Chromista"))
+        )
+      ),
+    Phylum = list(
+      Group = list(
+        Microbial = list(Taxon = list("Gastrotricha", "Loricifera")),
+        Worm = list(Taxon = list("Annelida", "Nemertea", "Platyhelminthes", "Sipuncula", "Chaetognatha")),
+        Biofouling = list(Taxon = list("Bryozoa", "Cnidaria", "Echinodermata", "Entoprocta", "Porifera")),
+        Other = list(Taxon = list("Ctenophora", "Nematoda", "Priapulida")),
+        Mollusk = list(Taxon = list("Mollusca")),
+        Arthropod = list(Taxon = list("Arthropoda"))
+        )
+      ),
+    Class = list(
+      Group = list(
+        Biofouling = list(Taxon = list("Ascidiacea")),
+        Other = list(Taxon = list("Actinopterygii", "Elasmobranchii", "Teleostei"))
+      )
+    )
+  ) 
+  
+taxon_key <- morpho_list %>%
+  gather(key = "Level") %>%
+  unnest_longer(value, indices_to = "Group") %>%
+  unnest_longer(value, values_to = "taxon_group", indices_include = F) %>%
+  unnest_longer(taxon_group, indices_include = F)
+
+```
+
+```{r prep-records-data, include = F}
 
 record_df <- df_orgs %>%
   mutate(taxon_group = ifelse(kingdom == "Animalia", phylum, kingdom),
-         taxon_group = ifelse(taxon_group == "Chordata", class, taxon_group),
-         taxon_group = factor(taxon_group),
-         taxon_group = fct_collapse(taxon_group,
-                                    Microbial = taxon_micro,
-                                    Photosynthetic = taxon_photo,
-                                    Worm = taxon_worm,
-                                    Biofouling = taxon_biofoul,
-                                    Other = taxon_other,
-                                    Mollusk = "Mollusca",
-                                    Arthropod = "Arthropoda"),
-         taxon_group = fct_explicit_na(taxon_group, "Other")) %>%
-  group_by(paper_id, taxon_group) %>%
+         taxon_group = ifelse(taxon_group == "Chordata", class, taxon_group)) %>%
+  left_join(taxon_key) %>%
+  rename(morph_group = Group) %>%
+  mutate(morph_group = fct_explicit_na(morph_group, "Other")) %>%
+  group_by(paper_id, morph_group) %>%
   count() %>%
   left_join(select(papers, paper_id, year_pub)) %>%
   ungroup() %>%
   mutate(year_pub = as.numeric(ifelse(paper_id == "999", 2022, year_pub))) %>%
-  group_by(year_pub, taxon_group) %>%
+  group_by(year_pub, morph_group) %>%
   summarise(taxon_count = sum(n)) %>%
-  ungroup()
+  group_by(year_pub) %>%
+  mutate(year_count = sum(taxon_count)) %>%
+  ungroup() %>%
+  complete(year_pub = 1995:2019, fill = list(year_count = 0, taxon_count = NA)) %>%
+  arrange(year_pub, desc(year_count)) %>%
+  mutate(year_count = ifelse(duplicated(year_pub), NA, year_count))
 
 ```
 
-```{r yearly records, echo = F, fig.cap = "Yearly counts of publications and records of identified organisms on AMD in the scientific literature.", fig.scap = "Database publications & records by year", fig.width = 6.5, fig.height = 3.5}
+```{r prep-pub-data, include = F}
+
+pub_df <- papers %>%
+  select(year_pub, paper_id) %>%
+  filter(paper_id != "999") %>%
+  distinct() %>%
+  group_by(year_pub) %>%
+  count() %>%
+  ungroup() %>%
+  complete(year_pub = 1995:2019, fill = list(n = 0))
+
+```
+
+```{r taxon-table, echo = F, out.width = params$width, fig.scap = "Table of morphological groups"}
+
+taxon_key %>%
+  group_by(Group, Level) %>%
+  summarise(Taxa = paste(taxon_group, collapse = ", "),
+            .groups = "drop") %>%
+  kable("latex", booktabs = T,
+        caption = "Grouping of identified organisms into morphological categories by taxonomy.")  %>%
+  kable_styling(latex_options = "scale_down")
+
+```
+
+
+```{r yearly-records, echo = F, fig.cap = "Yearly counts of publications and records of identified organisms on AMD in the scientific literature.", fig.scap = "Database publications & records by year", fig.width = 6.5, fig.height = 3.5, warning = F, error = F, message = F}
 
 record_df %>%
+  ungroup() %>%
   filter(year_pub != 2022) %>%
   ggplot() +
-  geom_bar(aes(x = year_pub, y = taxon_count, fill = taxon_group),
-           color = "black", size = 0.6, stat = "identity", width = 0.5,
+  geom_bar(aes(x = year_pub, y = taxon_count, fill = morph_group),
+           color = "grey40", size = 0.1, stat = "identity", width = 0.5,
            na.rm = T, alpha = 0.7) +
+  geom_text(aes(x = year_pub, y = year_count + 30, label = year_count),
+            size = rel(2), color = "grey10") +
   theme_minimal() +
-  guides(fill = guide_legend(title = "Taxonomic\nGroup", nrow = 1)) +
+  guides(fill = guide_legend(title = "Morphology", nrow = 1)) +
   theme(legend.position = "top", 
         legend.title = element_text(face = "bold", size = rel(0.8)),
         legend.text = element_text(size = rel(0.8)),
@@ -266,14 +319,14 @@ record_df %>%
         axis.title = element_text(size = rel(0.9))) +
   scale_x_continuous(limits = c(1994.1, 2019.9), breaks = scales::breaks_width(1),
                      expand = expansion(0)) +
-  labs(x = "Year Published",
-       y = "Count of Organisms Recorded")
+  labs(x = "Publication Year",
+       y = "All Organisms Recorded")
 
 ```
 
-```{r diagram of process, include = F, width = params$width, fig.cap = "Diagram of the process used to gather and integrate publised records of organisms associated with AMD into the database.", fig.scap = "Database creation process diagram"}
+```{r process-diagram, echo = F, out.width = 100%, fig.cap = "Diagram of the process used to gather and integrate publised records of organisms associated with AMD into the database.", fig.scap = "Database creation process diagram"}
 
-diagram_loc 
+knitr::include_graphics("figures/chapter-figs/database/process-diagram.jpg")
 
 ```
 
@@ -307,10 +360,10 @@ diagram_loc
 The records synthesised in this database were collected and described through the efforts of academic scientists and researchers, community scientists, and scientific professionals from around the world. We acknowledge their contributions to the body of knowledge compiled in this database and encourage further engagement with their published literature in our citation list. Where records from only one publication are used in continuing research, we recommend citing the publication directly or per the custodian's information. In the case where records from multiple sources were used from this database, this publication should be cited directly. This provenance can be determined using the publication identifier linked to every record in the database. For data originating from the Japanese Tsunami Marine Debris database, the work of Carlton et. al should be cited directly or in addition to this database.  
 
 ### Author Contributions  
-C.M. designed the methodology, performed all steps of the compilation and preparation of this database, and wrote the manuscript.  C.L.H. and M.L.C. advised on the database synthesis. M.B. and C.L.H. provided significant assistance with and review of the manuscript. J.M. and M.L.C. also assisted with the manuscript review. Further details on author contributions can be found in Table 1 provided with the online version of this manuscript.  
+C.M. designed the methodology, performed all steps of the compilation and preparation of this database, and wrote the manuscript. C.L.H. and M.L.C. advised on the project concept and database synthesis. M.B. and C.L.H. provided significant assistance with and review of the manuscript and advised on data cleaning and validation. J.M. and M.L.C. also assisted with the manuscript review. Further details on author contributions can be found in Table 1 provided with the online version of this manuscript.  
 
 ### Additional Information  
-Table 1 is only available in the online version of this paper.  
+The table of detailed authorship contributions is only available in the online version of this paper.  
 
 \textbf{Competing Interests}  
 The authors declare no competing financial interests.  
