@@ -89,15 +89,32 @@ data_sum_table <- data.frame(
 
 ```
 
+```{r quick stats, include = F}
+
+organism_count <- organisms_clean %>%
+  select(paper_id, scientific_name) %>%
+  distinct() %>%
+  count() %>%
+  pull(n) %>%
+  format(format = "f", big.mark = ",")
+
+paper_count <- papers %>%
+  select(paper_id) %>%
+  distinct() %>%
+  count() %>%
+  pull(n) %>%
+  format(format = "f", big.mark = ",")
+
+```
+
 ## Abstract  
 
-- How main measurement value is important (e.g. chlorophyll).  
-- Why it is the choice measurement for that purpose.  
-- How many records are included of main measurement and the spatiotemporal scope of their collection.  
-- Primary methods used to collect and process data in source material.  
-- Brief description of what source was used to find records.  
-- Where to access the database.  
-- What the database can be combined with and for which common uses.  
+- Humans have created a novel habitat in the ocean through the discharge of artificial materials like plastics, rubber, and manufactured wood products. The organisms that live and circulate through the marine environment in this new form of habitat have been identified, described, and otherwise published in the scientific record in growing numbers over the past 30 years. Comprehensively collating these records with their standardised taxonomy and corresponding spatial coordinates may aid in efforts to understand this ecosystem and its potential impacts on the rest of the marine environment. 
+- This database includes `r organism_count` of these recorded instances of organisms on anthropogenic marine debris (AMD) from `r paper_count` papers in every ocean basin, as well as the Mediterranean and several other seas published between 1992 and 2019.
+- Records were pulled from peer-reviewed scientific publications found using tailored keyword searches in Scopus, Web of Science, and ProQuest.  
+- Papers returned in the initial queries were then manually assessed for their relevance according to their title and abstract. Those identified as potentially relevant were then read by the researchers to locate and incorporate relevant data included in the text, figures, tables, and appendices into the database. The results of this effort were then joined with validated taxonomic nomenclature from the World Register of Marine Species, Global Biodiversity Information Facility, and  Integrated Taxonomic Information System. The broad marine region specified in each publication was manually noted along with the available spatial coordinates for the study as a whole from in-text description and georeferenced maps.
+- The resulting database can be accessed from the stable link provided along with this publication.  
+- Combining the taxonomic information in this database with trait or behavioural databases, such as XXXX, could yield insights into how these ecosystems assemble and function. Further detail could be added and spatial analysis performed by merging this database with oceanographic data available from XXXX or XXXX. 
 
 ### Corresponding author  
 
