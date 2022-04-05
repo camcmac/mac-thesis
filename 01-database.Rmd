@@ -140,10 +140,32 @@ kable(data_sum_table, "latex", booktabs = T, col.names = NULL,
 - In its current state, it may be particularly useful for those researching the impacts of AMD on coastal environments. This database can be easily combined with new findings to provide background and context. It may also be useful for tracking the locations or spread of invasive species for biosecurity researchers and marine resource managers.  
 - Trends found in this database should be presented with the caveat that there is an immense number of potential external sources that could not be captured or reported.  Findings related to materials should be carefully considered because reporting of which organisms was attached to which substrate was so rarely done that it could not be reliably recorded in this database. Spatial trends should also be considered judisciously due to the lack of tie between specific points and organisms. Studies with large spatial scopes should be removed prior to any spatial analysis. It is also worth noting that data from the Japanese Tsunami Marine Debris (JTMD) database [cite], paper ID 999, has far more detailed and validated records than any other, which may skew results from the North Pacific unless accounted for.  
 - The database is separated into five primary tables linked by two primary identifiers (Table XX). Identifiers are unique keys at the highest record levels: study and accepted taxonomic nomenclature. Study level variables include data that was reported most often in the methods section of the paper, like methodology and sampling locations. While material types were reported in the results section, these too were often reported at the level of the study itself and are therefore linked to the unique study identifier. Both accepted and utilised taxonomic nomenclature for the most detailed identification available, or lowest taxonomic unit (LTU), of every identified organism is the second primary identifying key. This links each organism to its correct nomenclature and enables systematic validation and updates as necessary.  
-- All of the data originates in peer-reviewed scientific literature published and returned in searches for the specified queries in three major research repositories (Table XX) between 1992 and 2019. Organisms were recorded on debris items collected from, or deliberately immersed and naturally colonised in, the marine environment during the course of formal scientific research. The database contains records from all marine environments globally, from beaches to salt marshes and deep sea trenches. It only contains what the researchers reported in their publications, not neccessarily all of the organisms found or identified. 
-- It is recommended that users of this database update the taxonomic nomenclature using the noted databases and database IDs provided. Where material types are relevant, it is also recommended to reference current IUPC nomenclature and ensure that materials are described using contemporary naming conventions. Spatial coordinates are provided with descriptive quality ratings to assist in analyses where accuracy is important. However, no particular level of accuracy is guaranteed. For a guide on how to join the different tables, see the diagram included in Appendix XX. 
+- All of the data originates in peer-reviewed scientific literature published and returned in searches for the specified queries in three major research repositories (Table XX) between 1992 and 2019. Organisms were recorded on debris items collected from, or deliberately immersed and naturally colonised in, the marine environment during the course of formal scientific research. The database contains records from all marine environments globally, from beaches to salt marshes and deep sea trenches. It only contains what the researchers reported in their publications, not neccessarily all of the organisms found or identified.  
+- It is recommended that users of this database update the taxonomic nomenclature using the noted databases and database IDs provided. Where material types are relevant, it is also recommended to reference current IUPC nomenclature and ensure that materials are described using contemporary naming conventions. Spatial coordinates are provided with descriptive quality ratings to assist in analyses where accuracy is important. However, no particular level of accuracy is guaranteed. For a guide on how to join the different tables, see the diagram included in Appendix XX.  
 - This database is provided in static format at the stable location associated with this publication. Any dynamic or updated versions of this database should reference this publication and be discoverable using that reference.
-- At the time of this publication there is no update schedule and no plans exist to provide this resource in any other format. 
+- At the time of this publication there is no update schedule and no plans exist to provide this resource in any other format.  
+
+```{r setup-keywords, include = F}
+
+prim_keywords <- "marine OR ocean"
+
+second_keywords <-c("debris  OR  litter", "wrack  OR  flotsam  OR  jetsam", "macroplastic*  OR  microplastic*  OR  mesoplastic*  OR  'plastic pollution'")
+
+df_keywords <- data.frame(Primary = rep(prim_keywords, length(second_keywords)),
+                          Secondary = second_keywords) %>%
+  mutate(Combined = paste0("'", Primary, "'", " AND '", Secondary, "'"))
+
+```
+
+```{r keywords-table, run = F, width = params$width, fig.scap = "Keywords for database creation"}
+
+df_keywords %>%
+  kable(., kable_format = "latex", booktabs = T,
+        caption = "Keywords used in the systematic database search that returned potentially relevant papers.") %>%
+  collapse_rows(.) %>%
+  kable_styling(., latex_options = "scale_down")
+
+```
 
 ## Methods  
 - Overview of methods used to collect the field data.  
@@ -342,7 +364,7 @@ record_df %>%
 
 ```
 
-```{r process-diagram, echo = F, out.width = 100%, fig.cap = "Diagram of the process used to gather and integrate publised records of organisms associated with AMD into the database.", fig.scap = "Database creation process diagram"}
+```{r process-diagram, echo = F, out.width = "100%", fig.cap = "Diagram of the process used to gather and integrate publised records of organisms associated with AMD into the database.", fig.scap = "Database creation process diagram"}
 
 knitr::include_graphics("figures/chapter-figs/database/process-diagram.jpg")
 

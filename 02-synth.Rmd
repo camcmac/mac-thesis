@@ -22,11 +22,12 @@ params:
 
 ## Abstract
 
-Text.
+A growing body of academic research addresses the growing quantity of anthropogenic debris, such as abandoned fishing nets and single-use plastic bags, in the every ocean and sea basin in the world (CITATION). Within this research are thousands of documented observations of organisms attached to or occupying this anthropogenic marine debris (AMD). This work synthesised those observations into one source to determine whether these organisms exhibit habitat preferences and to assess the state of topical research.  We found clear patterns in community assembly across general debris characteristics (material type, size, and location) with FINDINGS. There are also significant apparent patterns in sampling effort, FINDINGS. Trends in unique, novel taxonomic identifications on debris suggest that the AMD community is far from completely described, with particularly sparse data on FINDINGS.  
 
 ## Introduction
 
-Text.
+Land-use conversion is one of the top threats to terrestrial biodiversity (CITE).  As natural habitats are converted to meet the needs of humans, the organisms that they support die, or are displaced, while those organisms adapted to life alongside humans see local population booms (CITE). This same process may be occurring in marine environments where anthropogenic marine debris (AMD) provides an historically unprecedented amount of solid-surface habitat.
+AMD has been collected and measured throughout the water column, from the sun-soaked neustonic to the isolated benthos of the deep sea, across the planet (CITE) and its concentrations have been everywhere increasing since the first measurements in the 1950’s (CITE).  
 
 ## Methods
 
