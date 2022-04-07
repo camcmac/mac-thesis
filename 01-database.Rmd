@@ -160,9 +160,8 @@ df_keywords <- data.frame(Primary = rep(prim_keywords, length(second_keywords)),
 ```{r keywords-table, run = F, width = params$width, fig.scap = "Keywords for database creation"}
 
 df_keywords %>%
-  kable(., kable_format = "latex", booktabs = T,
+  kable(., "latex", booktabs = T,
         caption = "Keywords used in the systematic database search that returned potentially relevant papers.") %>%
-  collapse_rows(.) %>%
   kable_styling(., latex_options = "scale_down")
 
 ```
